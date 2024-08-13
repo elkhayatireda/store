@@ -14,7 +14,7 @@ function AdminLayout() {
     const [isHoverEnabled, setIsHoverEnabled] = useState(true);
 
     // Sidebar width, adjust according to your sidebar's width
-    const sidebarWidth = expanded ? '100px' : '0px';
+    const sidebarWidth = !isHoverEnabled ? '100px' : '0px';
 
     return (
         <>
