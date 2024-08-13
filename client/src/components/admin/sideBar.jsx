@@ -1,42 +1,37 @@
-import { useContext, createContext, useState } from "react"
+import { useContext, createContext } from "react"
 import { NavLink } from "react-router-dom"
+import { Button } from "../ui/button"
+import { Menu, X } from "lucide-react"
 
 const SidebarContext = createContext()
 
-export default function SideBar({ children }) {
-    const [expanded, setExpanded] = useState(false)
+export default function SideBar({ children, expanded, setExpanded, isHoverEnabled, setIsHoverEnabled }) {
+    const handleMenuClick = () => {
+        setExpanded((curr) => !curr);
+        setIsHoverEnabled((curr) => !curr);
+    };
 
     return (
-        <aside
-            className=" side-nav h-screen w-fit fixed top-0 left-0 z-50 shadow bg-white"
-            onMouseEnter={() => setExpanded(true)}
-            onMouseLeave={() => setExpanded(false)}
-        >
+        <aside className="side-nav h-screen w-fit fixed top-0 left-0 z-50 shadow bg-white">
             <nav className="h-full flex flex-col bg-background">
                 <div className="p-4 flex justify-between items-center">
-                    <div
-                        className={`flex items-center justify-center`}
-                    >
-                        {expanded ?
-                            <img src="/assets/logo11.png" alt="" className='w-40' />
-                            :
-                            <img src="/assets/uk.png" alt="" className='w-10' />
-                        }
-                    </div>
-                    {/* <Button
-                        variant='ghost'
-                        onClick={() => setExpanded((curr) => !curr)}
-                    >
-                        {expanded ? <FaChevronLeft /> : <FaChevronRight />}
-                    </Button> */}
+                    <Button onClick={handleMenuClick}>
+                        {expanded ? <X /> : <Menu />}
+                    </Button>
                 </div>
 
                 <SidebarContext.Provider value={{ expanded }}>
-                    <div className="flex-1 px-3 pt-5">{children}</div>
+                    <div
+                        onMouseEnter={() => isHoverEnabled && setExpanded(true)}
+                        onMouseLeave={() => isHoverEnabled && setExpanded(false)}
+                        className="flex-1 px-3 pt-5"
+                    >
+                        {children}
+                    </div>
                 </SidebarContext.Provider>
             </nav>
         </aside>
-    )
+    );
 }
 
 export function SidebarItem({ icon, text, location, alert }) {
