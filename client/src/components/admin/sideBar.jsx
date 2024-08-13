@@ -1,7 +1,5 @@
 import { useContext, createContext, useState } from "react"
 import { NavLink } from "react-router-dom"
-import { FaChevronRight, FaChevronLeft } from "react-icons/fa";
-import { Button } from "../ui/button";
 
 const SidebarContext = createContext()
 
@@ -9,20 +7,20 @@ export default function SideBar({ children }) {
     const [expanded, setExpanded] = useState(false)
 
     return (
-        <aside 
-            className=" side-nav h-screen w-fit fixed top-0 left-0 z-50 shadow bg-white" 
-            onMouseEnter={() => setExpanded(true)} 
-            onMouseLeave={() => setExpanded(false)} 
+        <aside
+            className=" side-nav h-screen w-fit fixed top-0 left-0 z-50 shadow bg-white"
+            onMouseEnter={() => setExpanded(true)}
+            onMouseLeave={() => setExpanded(false)}
         >
             <nav className="h-full flex flex-col bg-background">
                 <div className="p-4 flex justify-between items-center">
                     <div
-                        className={` flex items-center justify-center`}
+                        className={`flex items-center justify-center`}
                     >
-                        {expanded ? 
-                        <img src="/assets/logo11.png" alt="" className='w-40'/>
+                        {expanded ?
+                            <img src="/assets/logo11.png" alt="" className='w-40' />
                             :
-                        <img src="/assets/uk.png" alt="" className='w-10'/>
+                            <img src="/assets/uk.png" alt="" className='w-10' />
                         }
                     </div>
                     {/* <Button
@@ -47,7 +45,7 @@ export function SidebarItem({ icon, text, location, alert }) {
     return (
         <NavLink
             to={location}
-            
+
             className={`
         relative flex items-center ${expanded ? 'justify-start' : 'justify-center'} p-2 
         font-medium rounded-md cursor-pointer
