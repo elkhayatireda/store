@@ -25,8 +25,6 @@ export default function SideBar({ children, expanded, setExpanded, isHoverEnable
 
                 <SidebarContext.Provider value={{ expanded }}>
                     <div
-                        onMouseEnter={() => isHoverEnabled && setExpanded(true)}
-                        onMouseLeave={() => isHoverEnabled && setExpanded(false)}
                         className="flex-1"
                     >
                         {children}
