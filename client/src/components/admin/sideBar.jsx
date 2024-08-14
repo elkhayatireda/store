@@ -12,7 +12,7 @@ export default function SideBar({ children, expanded, setExpanded, isHoverEnable
     };
 
     return (
-        <aside className="side-nav p-2 h-screen w-fit fixed top-0 left-0 z-50 bg-[#0047ba] text-white">
+        <aside className="side-nav p-2 h-screen w-fit fixed top-0 left-0 z-50 bg-[#202939] text-white">
             <nav className="h-full flex flex-col">
                 <div className="mb-4 flex justify-between items-center">
                     {
@@ -49,7 +49,7 @@ export function SidebarItem({ icon, text, location, alert }) {
                 {icon}
                 {expanded && (
                     <div
-                        className={`whitespace-nowrap font-light`}
+                        className={`whitespace-nowrap text-sm`}
                     >
                         {text}
                     </div>

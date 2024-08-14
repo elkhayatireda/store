@@ -25,11 +25,11 @@ function AdminLayout() {
                 isHoverEnabled={isHoverEnabled}
                 setIsHoverEnabled={setIsHoverEnabled}
             >
-                <SidebarItem icon={<BarChart />} text={'Dashboard'} location={"/admin/dashboard"} />
-                <SidebarItem icon={<Users />} text={'Clients'} location={"/admin/clients"} />
-                <SidebarItem icon={<Headset />} text={'Employees'} location={"/admin/employees"} />
-                <SidebarItem icon={<Headset />} text={'Contacts'} location={"/admin/contacts"} />
-                <SidebarItem icon={<Settings />} text={'Settings'} location={"/admin/settings"} />
+                <SidebarItem icon={<BarChart size={22} />} text={'Dashboard'} location={"/admin/dashboard"} />
+                <SidebarItem icon={<Users size={22} />} text={'Clients'} location={"/admin/clients"} />
+                <SidebarItem icon={<Headset size={22} />} text={'Employees'} location={"/admin/employees"} />
+                <SidebarItem icon={<Headset size={22} />} text={'Contacts'} location={"/admin/contacts"} />
+                <SidebarItem icon={<Settings size={22} />} text={'Settings'} location={"/admin/settings"} />
             </SideBar>
             <main
                 className="bg-[#fbfcff] transition-all duration-300"
