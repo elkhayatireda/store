@@ -14,20 +14,20 @@ export default function SideBar({ children, expanded, setExpanded, isHoverEnable
     return (
         <aside className="side-nav h-screen w-fit fixed top-0 left-0 z-50 shadow bg-white">
             <nav className="h-full flex flex-col">
-                <div className="flex justify-between items-center px-2 pt-2">
+                <div className="flex justify-between items-center px-2  pt-3">
                     {
-                        expanded && <h1 className="font-bold">ADMIN</h1>
+                        expanded && <h1 className="font-bold text-2xl">ADMIN</h1>
                     }
-                    <Button onClick={handleMenuClick}>
-                        {!isHoverEnabled ? <X /> : expanded ? '' : <Menu />}
-                    </Button>
+                    <div onClick={handleMenuClick} className={`px-0 flex items-center ${ expanded ? 'justify-end': 'justify-center w-full' } cursor-pointer `}>
+                        {!isHoverEnabled ? <X /> : expanded ? '' : <Menu size={30} />}
+                    </div>
                 </div>
 
                 <SidebarContext.Provider value={{ expanded }}>
                     <div
                         onMouseEnter={() => isHoverEnabled && setExpanded(true)}
                         onMouseLeave={() => isHoverEnabled && setExpanded(false)}
-                        className="flex-1 px-2 pt-5"
+                        className="flex-1 px-2 pt-10"
                     >
                         {children}
                     </div>
@@ -44,9 +44,9 @@ export function SidebarItem({ icon, text, location, alert }) {
         <NavLink
             to={location}
             className={`
-        my-1 relative flex items-center ${expanded ? 'justify-start' : 'justify-center'}
+        my-2 relative flex items-center ${expanded ? 'justify-start' : 'justify-center'}
         font-medium rounded-md cursor-pointer
-        transition-colors group  text-gray-100 `}
+        transition-colors group  text-gray-100 text-md`}
         >
             <div className={`group flex items-center p-2 w-36 ${expanded ? "w-36" : "w-fit"} rounded hover:bg-[#edf3ff] `}>
                 {icon}
