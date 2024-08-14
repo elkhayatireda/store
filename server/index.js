@@ -10,7 +10,7 @@ import { initSocket } from './services/socket.js';
 const app = express();   
 app.use(
   cors({
-    origin: "https://win-call-client.vercel.app",
+    origin: "http://localhost:5173",
     methods: ["GET", "POST", "DELETE", "PUT"],
     allowedHeaders: ["content-type", "Authorization"],
     credentials: true,
@@ -27,7 +27,7 @@ mongoose.connect(process.env.MONGODB_URL)
   .catch((error) => {
     console.error(`something went wrong while connecting to database: ${error}`);
   });
-
+    
 server.listen(process.env.PORT, (error) => {
   if (error) {
     console.error(`Error starting server: ${error}`);

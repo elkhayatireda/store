@@ -10,7 +10,8 @@ import HostLayout from '../layouts/HostLayout';
 import AdminAuthRoute from './protectors/AdminAuthRoute';
 
 // pages
-import AdminDashboard from '@/pages/admin/dashboard';
+// import AdminDashboard from '@/pages/admin/dashboard';
+import AdminSingnIn from '@/pages/admin/signin';
 
 // router
 export const router = createBrowserRouter([
@@ -19,7 +20,7 @@ export const router = createBrowserRouter([
         children: [
             {
                 path: "/admin/login",
-                element: <h1>tttttt</h1>
+                element: <AdminSingnIn />
             },
         ]
     },
@@ -28,7 +29,7 @@ export const router = createBrowserRouter([
         children: [
             {
                 path: "/admin/dashboard",
-                element: <AdminDashboard />
+                element: <h1>tttttt</h1>
             },
         ]
     },
