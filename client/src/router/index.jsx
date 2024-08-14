@@ -25,7 +25,7 @@ export const router = createBrowserRouter([
         ]
     },
     {
-        element: <AdminAuthRoute><AdminLayout /></AdminAuthRoute>,
+        element: <AdminLayout />,
         children: [
             {
                 path: "/admin/dashboard",
@@ -35,7 +35,7 @@ export const router = createBrowserRouter([
     },
     {
         path: '*',
-        element: <h1>heyyyyyy </h1>
+        element: <h1>heyyyyyy</h1>
 
     }
 ])
