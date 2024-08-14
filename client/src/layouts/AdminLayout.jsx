@@ -11,10 +11,9 @@ import { useState } from "react";
 
 function AdminLayout() {
     const [expanded, setExpanded] = useState(false);
-    const [isHoverEnabled, setIsHoverEnabled] = useState(true);
 
     // Sidebar width, adjust according to your sidebar's width
-    const sidebarWidth = !isHoverEnabled ? '100px' : '0px';
+    const sidebarWidth = expanded ? '100px' : '0px';
 
     return (
         <>
@@ -22,8 +21,6 @@ function AdminLayout() {
             <SideBar
                 expanded={expanded}
                 setExpanded={setExpanded}
-                isHoverEnabled={isHoverEnabled}
-                setIsHoverEnabled={setIsHoverEnabled}
             >
                 <SidebarItem icon={<BarChart size={22} />} text={'Dashboard'} location={"/admin/dashboard"} />
                 <SidebarItem icon={<Users size={22} />} text={'Clients'} location={"/admin/clients"} />

@@ -101,6 +101,10 @@ input:-webkit-autofill:active {
   @apply bg-white text-[#202939];
 }
 
+.side-nav .active .card {
+  @apply bg-blue-950 text-white;
+}
+
 .hide-scrollbar {
   -ms-overflow-style: none;
   /* Internet Explorer 10+ */

@@ -1,38 +1,35 @@
 import { useContext, createContext } from "react"
 import { NavLink } from "react-router-dom"
-import { Button } from "../ui/button"
-import { LayoutDashboard, Menu, X } from "lucide-react"
+import { Button } from "../ui/button";
+import { LayoutDashboard, X } from "lucide-react";
 
 const SidebarContext = createContext()
 
-export default function SideBar({ children, expanded, setExpanded, isHoverEnabled, setIsHoverEnabled }) {
-    const handleMenuClick = () => {
-        setExpanded((curr) => !curr);
-        setIsHoverEnabled((curr) => !curr);
-    };
+export default function SideBar({ children, expanded, setExpanded }) {
 
     return (
-        <aside className="side-nav p-2 h-screen w-fit fixed top-0 left-0 z-50 bg-[#202939] text-white">
-            <nav className="h-full flex flex-col">
-                <div className="mb-4 flex justify-between items-center">
-                    {
-                        expanded && <h1 className="font-bold text-2xl">ADMIN</h1>
-                    }
-                    <Button onClick={handleMenuClick} className={`${!isHoverEnabled ? 'p-0' : 'p-2'}`}>
-                        {!isHoverEnabled ? <X /> : expanded ? '' : <LayoutDashboard />}
+        <aside className="px-2 py-1 side-nav h-screen w-fit fixed top-0 left-0 z-50 shadow bg-[#202939] text-white">
+            <nav className="h-full flex flex-col bg-background">
+                <div className="flex justify-between items-center">
+                    <h1
+                        className={`text-xl font-semibold overflow-hidden transition-all ${expanded ? "w-32" : "w-0"}`}
+                    >
+                        ADMIN
+                    </h1>
+                    <Button
+                        variant='ghost'
+                        onClick={() => setExpanded((curr) => !curr)}
+                    >
+                        {expanded ? <X /> : <LayoutDashboard />}
                     </Button>
                 </div>
 
                 <SidebarContext.Provider value={{ expanded }}>
-                    <div
-                        className="flex-1"
-                    >
-                        {children}
-                    </div>
+                    <div className="flex-1 mt-6">{children}</div>
                 </SidebarContext.Provider>
             </nav>
         </aside>
-    );
+    )
 }
 
 export function SidebarItem({ icon, text, location, alert }) {
@@ -41,23 +38,33 @@ export function SidebarItem({ icon, text, location, alert }) {
     return (
         <NavLink
             to={location}
-            className={`my-2 flex justify-center items-center font-medium rounded-md cursor-pointer transition-all`}
+            className={`my-3 relative flex items-center justify-center font-medium rounded-md cursor-pointer transition-colors group`}
         >
-            <div className={`p-2 group flex items-center gap-2 w-36 ${expanded ? "w-36" : "w-fit"} rounded hover:bg-[#000080] transition-all`}>
+            <div className={`p-1 group flex items-center gap-1 ${expanded ? "w-full" : "w-fit"} rounded hover:bg-blue-50 hover:text-blue-950`}>
                 {icon}
-                {expanded && (
-                    <div
-                        className={`whitespace-nowrap text-sm`}
-                    >
-                        {text}
-                    </div>
-                )}
+                <span
+                    className={`overflow-hidden transition-all ${expanded ? "pl-3" : "hidden"}`}
+                >
+                    {text}
+                </span>
             </div>
             {/* alert is for notifications */}
             {alert && (
                 <div
                     className={`absolute right-2 w-2 h-2 rounded bg-primary ${expanded ? "" : "top-2"}`}
                 />
+            )}
+
+            {!expanded && (
+                <div
+                    className={`
+          card whitespace-nowrap absolute left-full px-2 py-1 ml-6
+          bg-secondary text-primary text-sm
+          invisible opacity-20 translate-x-3 transition-all
+          group-hover:visible group-hover:opacity-100 group-hover:translate-x-0 bg-blue-950 text-white rounded`}
+                >
+                    {text}
+                </div>
             )}
         </NavLink>
     )
