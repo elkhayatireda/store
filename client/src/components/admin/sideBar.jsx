@@ -13,10 +13,13 @@ export default function SideBar({ children, expanded, setExpanded, isHoverEnable
 
     return (
         <aside className="side-nav h-screen w-fit fixed top-0 left-0 z-50 shadow bg-white">
-            <nav className="h-full flex flex-col bg-background">
-                <div className="p-4 flex justify-between items-center">
+            <nav className="h-full flex flex-col">
+                <div className="flex justify-between items-center px-2 pt-2">
+                    {
+                        expanded && <h1 className="font-bold">ADMIN</h1>
+                    }
                     <Button onClick={handleMenuClick}>
-                        {!isHoverEnabled ? <X /> : <Menu />}
+                        {!isHoverEnabled ? <X /> : expanded ? '' : <Menu />}
                     </Button>
                 </div>
 
@@ -24,7 +27,7 @@ export default function SideBar({ children, expanded, setExpanded, isHoverEnable
                     <div
                         onMouseEnter={() => isHoverEnabled && setExpanded(true)}
                         onMouseLeave={() => isHoverEnabled && setExpanded(false)}
-                        className="flex-1 px-3 pt-5"
+                        className="flex-1 px-2 pt-5"
                     >
                         {children}
                     </div>
@@ -40,9 +43,8 @@ export function SidebarItem({ icon, text, location, alert }) {
     return (
         <NavLink
             to={location}
-
             className={`
-        relative flex items-center ${expanded ? 'justify-start' : 'justify-center'} p-2 
+        my-1 relative flex items-center ${expanded ? 'justify-start' : 'justify-center'}
         font-medium rounded-md cursor-pointer
         transition-colors group  text-gray-100 `}
         >
