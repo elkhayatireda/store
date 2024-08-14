@@ -1,6 +1,4 @@
 import React, { useEffect, useState, useContext } from 'react'
-import { FcGoogle } from "react-icons/fc"
-import { TiArrowSortedDown } from "react-icons/ti";
 import  {axiosClient}  from "../../api/axios"
 import { Link, useNavigate } from 'react-router-dom';
 import { authContext } from '../../contexts/AuthWrapper';
@@ -72,14 +70,14 @@ export default function SignIn() {
   
   return (
     <div className="max-w-6xl  mx-auto h-screen">
-      <div className='flex items-center justify-center lg:gap-16  py-24'>
+      <div className='flex items-center justify-center  py-24'>
       <ToastContainer />
        <div className='basis-1/2  items-center justify-center hidden lg:flex'>
           <img src={'/assets/img2.svg'} alt="logo" className="w-full" />
        </div>
        <div className='basis-2/2 md:basis-1/2 w-full mx-16 flex flex-col lg:mr-10 py-24 lg:pb-0  '>
          <div> 
-           <h2 className='text-5xl font-bold mb-10 text-center text-[#414141]'>Welcome Admin</h2>
+           <h2 className='text-5xl font-bold mb-5 text-center text-[#414141]'>Welcome Admin</h2>
            <div className=' mb-3'>
               <label htmlFor="email" className='block text-[#6d6c6c] text-md mb-1'>email</label>
               <input 

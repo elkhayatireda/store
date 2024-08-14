@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 const adminSchema = mongoose.Schema(
     {
-        fullName: {
+        fullName: {  
             type: String ,
             required: true,
         },
@@ -23,7 +23,6 @@ const adminSchema = mongoose.Schema(
             type: String ,
             required: true,
         },
-        role: { type: String, enum: ['admin', 'superAdmin'], default: 'admin' },
     },
     {
         timestamps: true,
