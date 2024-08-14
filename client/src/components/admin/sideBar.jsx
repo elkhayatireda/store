@@ -49,7 +49,7 @@ export function SidebarItem({ icon, text, location, alert }) {
                 {icon}
                 {expanded && (
                     <div
-                        className={`whitespace-nowrap font-light`}
+                        className={`whitespace-nowrap text-sm`}
                     >
                         {text}
                     </div>

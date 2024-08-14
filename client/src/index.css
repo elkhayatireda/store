@@ -98,7 +98,7 @@ input:-webkit-autofill:active {
 }
 
 .side-nav .active div {
-  @apply bg-white text-[#0047ba];
+  @apply bg-white text-[#202939];
 }
 
 .hide-scrollbar {
