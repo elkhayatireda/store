@@ -7,7 +7,7 @@ import upload from '../config/upload.js';
 
 const router = express.Router();
 
-router.post('/', upload.single('img'), createCategory);
+router.post('/', verifyTokenAdmin, upload.single('img'), createCategory);
 router.get('/', verifyTokenAdmin, getCategories);
 router.get('/:id', verifyTokenAdmin, getCategory);
 router.put('/:id', verifyTokenAdmin, updateCategory);
