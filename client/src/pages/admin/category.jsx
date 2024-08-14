@@ -1,63 +1,78 @@
 import CustomInput from '@/components/custom/CustomInput';
+import CustomTextInput from '@/components/custom/CustomTextInput';
+import { Button } from '@/components/ui/button';
 import React, { useState } from 'react';
+import { axiosClient } from '@/api/axios';
 
 const CategoryForm = () => {
     const [title, setTitle] = useState('');
-    const [imgPath, setImgPath] = useState('');
-    const [url, setUrl] = useState('');
+    const [description, setDescription] = useState('');
+    const [img, setImgPath] = useState(null);
     const [errors, setErrors] = useState({});
 
     const validate = () => {
         const newErrors = {};
         if (!title) newErrors.title = 'Title is required';
-        if (!imgPath) newErrors.imgPath = 'Image Path is required';
-        if (!url) newErrors.url = 'URL is required';
+        if (!img) newErrors.img = 'Image is required';
         return newErrors;
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         const newErrors = validate();
         if (Object.keys(newErrors).length > 0) {
             setErrors(newErrors);
         } else {
-            // Submit the form data (e.g., send it to the backend)
-            const categoryData = { title, imgPath, url };
-            console.log('Submitting:', categoryData);
+            const formData = new FormData();
+            formData.append('title', title);
+            formData.append('description', description);
+            formData.append('img', img);
 
-            // Reset form after submission
-            setTitle('');
-            setImgPath('');
-            setUrl('');
-            setErrors({});
+            try {
+                const res = await axiosClient.post('/categories', formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
+                });
+
+                console.log(res);
+                setTitle('');
+                setDescription('');
+                setImgPath(null);
+                setErrors({});
+            } catch (error) {
+                console.error('Error creating category:', error);
+            }
         }
     };
 
     return (
-        <form onSubmit={handleSubmit} className='bg-red-700'>
-            <CustomInput
-                label="Title"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                error={errors.title}
-                type="text"
-            />
-            <CustomInput
-                label="Image Path"
-                value={imgPath}
-                onChange={(e) => setImgPath(e.target.value)}
-                error={errors.imgPath}
-                type="text"
-            />
-            <CustomInput
-                label="URL"
-                value={url}
-                onChange={(e) => setUrl(e.target.value)}
-                error={errors.url}
-                type="text"
-            />
-            <button type="submit" className="submit-button">Submit</button>
-        </form>
+        <div>
+            <h2>Create a new category</h2>
+            <form onSubmit={handleSubmit}>
+                <CustomInput
+                    label="Title"
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    error={errors.title}
+                    type="text"
+                />
+                <CustomTextInput
+                    label="Description"
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    error={errors.description}
+                    type="text"
+                />
+                <CustomInput
+                    label="Image"
+                    onChange={(e) => setImgPath(e.target.files[0])}
+                    error={errors.img}
+                    type="file"
+                />
+                <Button type="submit">Submit</Button>
+            </form>
+        </div>
     );
 };
 

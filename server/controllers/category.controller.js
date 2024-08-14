@@ -1,12 +1,16 @@
 import Category from "../models/category.model.js";
 
-// Create a new category
 export const createCategory = async (req, res) => {
-  const { title, imgPath } = req.body;
+  const { title, description } = req.body;
   try {
-    const newCategory = new Category({ title, imgPath });
+    let imgPath = null;
+    if (req.file) {
+      imgPath = req.file.path;
+    }
+
+    const newCategory = new Category({ title, description, imgPath });
     await newCategory.save();
-    res.status(201).json({ message: "Category created successfully", newCategory });
+    res.status(201).json({ message: "Category created successfully, " + imgPath, newCategory });
   } catch (error) {
     console.error("Error creating category:", error);
     res.status(500).json({ message: "Internal server error" });
