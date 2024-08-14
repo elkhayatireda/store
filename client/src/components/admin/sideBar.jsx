@@ -8,7 +8,7 @@ const SidebarContext = createContext()
 export default function SideBar({ children, expanded, setExpanded }) {
 
     return (
-        <aside className="px-2 py-1 side-nav h-screen w-fit fixed top-0 left-0 z-50 shadow bg-[#202939] text-white">
+        <aside className="px-3 py-1 side-nav h-screen w-fit fixed top-0 left-0 z-50 shadow bg-[#202939] text-white">
             <nav className="h-full flex flex-col bg-background">
                 <div className="flex justify-between items-center">
                     <h1
@@ -18,6 +18,7 @@ export default function SideBar({ children, expanded, setExpanded }) {
                     </h1>
                     <Button
                         variant='ghost'
+                        className='p-1'
                         onClick={() => setExpanded((curr) => !curr)}
                     >
                         {expanded ? <X /> : <LayoutDashboard />}
