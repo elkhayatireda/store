@@ -16,7 +16,7 @@ export default function SideBar({ children, expanded, setExpanded, isHoverEnable
             <nav className="h-full flex flex-col bg-background">
                 <div className="p-4 flex justify-between items-center">
                     <Button onClick={handleMenuClick}>
-                        {expanded ? <X /> : <Menu />}
+                        {!isHoverEnabled ? <X /> : <Menu />}
                     </Button>
                 </div>
 
