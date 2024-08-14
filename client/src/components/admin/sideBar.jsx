@@ -1,7 +1,7 @@
 import { useContext, createContext } from "react"
 import { NavLink } from "react-router-dom"
 import { Button } from "../ui/button"
-import { Menu, X } from "lucide-react"
+import { LayoutDashboard, Menu, X } from "lucide-react"
 
 const SidebarContext = createContext()
 
@@ -12,14 +12,14 @@ export default function SideBar({ children, expanded, setExpanded, isHoverEnable
     };
 
     return (
-        <aside className="side-nav h-screen w-fit fixed top-0 left-0 z-50 shadow bg-white">
+        <aside className="side-nav p-2 h-screen w-fit fixed top-0 left-0 z-50 bg-[#0047ba] text-white">
             <nav className="h-full flex flex-col">
-                <div className="flex justify-between items-center px-2 pt-2">
+                <div className="mb-4 flex justify-between items-center">
                     {
                         expanded && <h1 className="font-bold">ADMIN</h1>
                     }
-                    <Button onClick={handleMenuClick}>
-                        {!isHoverEnabled ? <X /> : expanded ? '' : <Menu />}
+                    <Button onClick={handleMenuClick} className={`${!isHoverEnabled ? 'p-0' : 'p-2'}`}>
+                        {!isHoverEnabled ? <X /> : expanded ? '' : <LayoutDashboard />}
                     </Button>
                 </div>
 
@@ -27,7 +27,7 @@ export default function SideBar({ children, expanded, setExpanded, isHoverEnable
                     <div
                         onMouseEnter={() => isHoverEnabled && setExpanded(true)}
                         onMouseLeave={() => isHoverEnabled && setExpanded(false)}
-                        className="flex-1 px-2 pt-5"
+                        className="flex-1"
                     >
                         {children}
                     </div>
@@ -43,36 +43,23 @@ export function SidebarItem({ icon, text, location, alert }) {
     return (
         <NavLink
             to={location}
-            className={`
-        my-1 relative flex items-center ${expanded ? 'justify-start' : 'justify-center'}
-        font-medium rounded-md cursor-pointer
-        transition-colors group  text-gray-100 `}
+            className={`my-2 flex justify-center items-center font-medium rounded-md cursor-pointer transition-all`}
         >
-            <div className={`group flex items-center p-2 w-36 ${expanded ? "w-36" : "w-fit"} rounded hover:bg-[#edf3ff] `}>
+            <div className={`p-2 group flex items-center gap-2 w-36 ${expanded ? "w-36" : "w-fit"} rounded hover:bg-[#000080] transition-all`}>
                 {icon}
-                <span
-                    className={`overflow-hidden transition-all ${expanded ? "pl-3" : "hidden"} text-[#222222]`}
-                >
-                    {text}
-                </span>
+                {expanded && (
+                    <div
+                        className={`whitespace-nowrap font-light`}
+                    >
+                        {text}
+                    </div>
+                )}
             </div>
             {/* alert is for notifications */}
             {alert && (
                 <div
                     className={`absolute right-2 w-2 h-2 rounded bg-primary ${expanded ? "" : "top-2"}`}
                 />
-            )}
-
-            {!expanded && (
-                <div
-                    className={`
-          whitespace-nowrap absolute left-full px-2 py-1 ml-6
-          bg-secondary text-primary text-sm
-          invisible opacity-20 translate-x-3 transition-all
-          group-hover:visible group-hover:opacity-100 group-hover:translate-x-0   rounded`}
-                >
-                    {text}
-                </div>
             )}
         </NavLink>
     )

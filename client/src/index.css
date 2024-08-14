@@ -96,14 +96,19 @@ input:-webkit-autofill:focus,
 input:-webkit-autofill:active {
   transition: background-color 5000s ease-in-out 5000s;
 }
+
 .side-nav .active div {
-  @apply bg-[#edf3ff] ;
+  @apply bg-white text-[#0047ba];
 }
+
 .hide-scrollbar {
-  -ms-overflow-style: none;  /* Internet Explorer 10+ */
-  scrollbar-width: none;     /* Firefox */
+  -ms-overflow-style: none;
+  /* Internet Explorer 10+ */
+  scrollbar-width: none;
+  /* Firefox */
 }
 
 .hide-scrollbar::-webkit-scrollbar {
-  display: none; /* WebKit browsers */
+  display: none;
+  /* WebKit browsers */
 }
