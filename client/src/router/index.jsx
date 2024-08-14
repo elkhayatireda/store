@@ -12,6 +12,7 @@ import AdminAuthRoute from './protectors/AdminAuthRoute';
 // pages
 // import AdminDashboard from '@/pages/admin/dashboard';
 import AdminSingnIn from '@/pages/admin/signin';
+import CategoryForm from '@/pages/admin/category';
 
 // router
 export const router = createBrowserRouter([
@@ -29,7 +30,7 @@ export const router = createBrowserRouter([
         children: [
             {
                 path: "/admin/dashboard",
-                element: <h1>tttttt</h1>
+                element: <CategoryForm />
             },
         ]
     },

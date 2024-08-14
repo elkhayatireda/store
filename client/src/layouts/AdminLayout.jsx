@@ -13,7 +13,7 @@ function AdminLayout() {
     const [expanded, setExpanded] = useState(false);
 
     // Sidebar width, adjust according to your sidebar's width
-    const sidebarWidth = expanded ? '100px' : '0px';
+    const sidebarWidth = expanded ? '190px' : '65px';
 
     return (
         <>
@@ -29,8 +29,8 @@ function AdminLayout() {
                 <SidebarItem icon={<Settings size={22} />} text={'Settings'} location={"/admin/settings"} />
             </SideBar>
             <main
-                className="bg-[#fbfcff] transition-all duration-300"
-                style={{ marginLeft: sidebarWidth }} // Adjusts the margin-left based on sidebar's state
+                className="transition-all duration-300 mt"
+                style={{ marginLeft: sidebarWidth, marginTop: '4.5rem' }} // Adjusts the margin-left based on sidebar's state
             >
                 <Outlet />
             </main>
