@@ -6,6 +6,7 @@ import { axiosClient } from '@/api/axios';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { ChevronLeft } from 'lucide-react';
+import imageCompression from 'browser-image-compression'; // Import the library
 
 const CategoryForm = () => {
     const navigate = useNavigate();
@@ -33,32 +34,49 @@ const CategoryForm = () => {
             };
             fetchCategory();
         }
-    }, [id]);
+    }, [id, navigate]);
 
     const validate = () => {
         const newErrors = {};
         if (!title) newErrors.title = 'Title is required';
-        if (!imgPreview && id === 'create') newErrors.img = 'Image is required';
+        if (id === 'create' && !img && !imgPreview) newErrors.img = 'Image is required';
         return newErrors;
     };
 
-    const handleImageChange = (e) => {
+    const handleImageChange = async (e) => {
         const file = e.target.files[0];
         if (file) {
-            if (file.size > 5 * 1024 * 1024) { // 5MB
-                setErrors(prevErrors => ({
-                    ...prevErrors,
-                    img: 'File size too large. Max size is 5MB.'
-                }));
-                setImg(null);
-                setImgPreview(null);
-            } else {
-                setImg(file);
-                setImgPreview(URL.createObjectURL(file)); // Create a preview URL for the image
+            try {
+                if (file.size > 5 * 1024 * 1024) { // 5MB
+                    setErrors(prevErrors => ({
+                        ...prevErrors,
+                        img: 'File size too large. Max size is 5MB.'
+                    }));
+                    setImg(null);
+                    setImgPreview(null);
+                    return;
+                }
+
+                // Compress the image
+                const options = {
+                    maxSizeMB: 1, // Max size of compressed image in MB
+                    maxWidthOrHeight: 800, // Max width or height of compressed image
+                    useWebWorker: true,
+                };
+                const compressedFile = await imageCompression(file, options);
+
+                // Create a preview URL for the compressed image
+                const compressedImagePreviewUrl = URL.createObjectURL(compressedFile);
+
+                setImg(compressedFile);
+                setImgPreview(compressedImagePreviewUrl);
                 setErrors(prevErrors => ({
                     ...prevErrors,
                     img: null
                 }));
+            } catch (error) {
+                console.error('Error compressing image:', error);
+                toast.error('Error compressing image');
             }
         }
     };
@@ -94,7 +112,7 @@ const CategoryForm = () => {
                 navigate('/admin/categories');
             } catch (error) {
                 console.error(error);
-                toast.error(error.response.data.message);
+                toast.error('Error saving category');
                 setLoading(false);
             }
         }
