@@ -3,6 +3,7 @@ import { axiosClient } from '@/api/axios';
 import { Button } from '@/components/ui/button';
 import { toast } from 'react-toastify';
 import { Link } from 'react-router-dom';
+import { Plus } from 'lucide-react';
 
 function Categories() {
     const [categories, setCategories] = useState([]);
@@ -36,8 +37,18 @@ function Categories() {
 
     return (
         <div className="container mx-auto p-6">
-            <h1 className="text-2xl font-bold mb-6">Categories</h1>
-            <Link to={'/admin/categories/create'}>create</Link>
+            <div className='mb-6 flex justify-between items-center'>
+                <div>
+                    <h2 className="text-2xl font-semibold">Categories</h2>
+                    <p className='text-sm'>Here you can manage the catagories in your store</p>
+                </div>
+                <Link
+                    className='flex items-center gap-1 px-3 py-1.5 rounded bg-blue-950 text-white'
+                    to={'/admin/categories/create'}
+                >
+                    Create <Plus size={18} />
+                </Link>
+            </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                 {categories.map((category) => (
                     <div key={category._id} className="bg-white shadow-md rounded-lg overflow-hidden">
@@ -47,16 +58,23 @@ function Categories() {
                             className="w-full h-48 object-cover"
                         />
                         <div className="p-4">
-                            <h3 className="text-lg font-semibold mb-2">{category.title}</h3>
-                            <p className="text-gray-600 mb-4">{category.description}</p>
-                            <Button
-                                variant='destructive'
-                                className="bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600"
-                                onClick={() => handleDelete(category._id)}
-                            >
-                                Delete
-                            </Button>
-                            <Link to={'/admin/categories/' + category._id}>update</Link>
+                            <h3 className="text-lg font-medium">{category.title}</h3>
+                            <p className="text-xs text-gray-600 mb-4">{category.description}</p>
+                            <div className='flex justify-end items-center gap-2'>
+                                <Button
+                                    variant='destructive'
+                                    className="bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600"
+                                    onClick={() => handleDelete(category._id)}
+                                >
+                                    Delete
+                                </Button>
+                                <Link
+                                    className='px-3 py-2 rounded bg-blue-600 text-white'
+                                    to={'/admin/categories/' + category._id}
+                                >
+                                    update
+                                </Link>
+                            </div>
                         </div>
                     </div>
                 ))}

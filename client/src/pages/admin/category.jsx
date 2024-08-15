@@ -3,7 +3,7 @@ import CustomTextInput from '@/components/custom/CustomTextInput';
 import { Button } from '@/components/ui/button';
 import React, { useState, useEffect } from 'react';
 import { axiosClient } from '@/api/axios';
-import { useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
 const CategoryForm = () => {
@@ -94,6 +94,7 @@ const CategoryForm = () => {
 
     return (
         <div>
+            <Link to={'/admin/categories'}>Back</Link>
             <h2>{id !== 'create' ? 'Edit Category' : 'Create a new category'}</h2>
             <form onSubmit={handleSubmit}>
                 <CustomInput
