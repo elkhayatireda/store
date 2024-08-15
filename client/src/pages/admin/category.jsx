@@ -5,6 +5,7 @@ import React, { useState, useEffect } from 'react';
 import { axiosClient } from '@/api/axios';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { ChevronLeft } from 'lucide-react';
 
 const CategoryForm = () => {
     const navigate = useNavigate();
@@ -94,39 +95,59 @@ const CategoryForm = () => {
 
     return (
         <div>
-            <Link to={'/admin/categories'}>Back</Link>
-            <h2>{id !== 'create' ? 'Edit Category' : 'Create a new category'}</h2>
-            <form onSubmit={handleSubmit}>
-                <CustomInput
-                    label="Title"
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                    error={errors.title}
-                    type="text"
-                />
-                <CustomTextInput
-                    label="Description"
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                    error={errors.description}
-                    type="text"
-                />
-                <div className='flex items-center justify-between'>
-                    <CustomInput
-                        label="Image"
-                        onChange={handleImageChange} // Use the new handler
-                        error={errors.img}
-                        type="file"
-                    />
-                    {imgPreview && (
-                        <img
-                            className='w-80 h-80 aspect-square object-cover'
-                            src={imgPreview}
-                            alt="Selected preview"
+            <div className='flex items-center justify-between'>
+                <h2 className='text-xl font-semibold'>
+                    {id !== 'create' ? `Edit ${title} Category` : 'Create a new category'}
+                </h2>
+                <Link
+                    className='flex items-center gap-0.5 text-blue-500'
+                    to={'/admin/categories'}
+                >
+                    <ChevronLeft size={18} /> Back
+                </Link>
+            </div>
+            <form className='mt-7' onSubmit={handleSubmit}>
+                <div className='w-full flex justify-center items-center gap-8'>
+                    <div className='w-full'>
+                        <CustomInput
+                            label="Title"
+                            value={title}
+                            onChange={(e) => setTitle(e.target.value)}
+                            error={errors.title}
+                            type="text"
                         />
-                    )}
+                        <CustomTextInput
+                            label="Description"
+                            value={description}
+                            onChange={(e) => setDescription(e.target.value)}
+                            error={errors.description}
+                            type="text"
+                        />
+                    </div>
+                    <div className='w-full'>
+                        {imgPreview && (
+                            <img
+                                className='w-24 h-24 aspect-square object-cover rounded-sm'
+                                src={imgPreview}
+                                alt="Selected preview"
+                            />
+                        )}
+                        <CustomInput
+                            label="Image"
+                            onChange={handleImageChange} // Use the new handler
+                            error={errors.img}
+                            type="file"
+                        />
+                    </div>
                 </div>
-                <Button type="submit">{id !== 'create' ? 'Update' : 'Create'}</Button>
+                <div className='mt-5 flex justify-end'>
+                    <Button
+                        className='bg-blue-600 text-white'
+                        type="submit"
+                    >
+                        {id !== 'create' ? 'Update' : 'Create'}
+                    </Button>
+                </div>
             </form>
         </div>
     );

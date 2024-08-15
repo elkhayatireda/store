@@ -29,7 +29,7 @@ function AdminLayout() {
                 <SidebarItem icon={<Settings size={22} />} text={'Settings'} location={"/admin/settings"} />
             </SideBar>
             <main
-                className="transition-all duration-300 mt"
+                className="transition-all duration-300 pb-4 pr-3"
                 style={{ marginLeft: sidebarWidth, marginTop: '4.5rem' }} // Adjusts the margin-left based on sidebar's state
             >
                 <Outlet />

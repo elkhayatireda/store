@@ -55,7 +55,7 @@ function Categories() {
                         <img
                             src={category.imgPath}
                             alt={category.title}
-                            className="w-full h-48 object-cover"
+                            className="w-full h-48 object-cover aspect-square"
                         />
                         <div className="p-4">
                             <h3 className="text-lg font-medium">{category.title}</h3>
