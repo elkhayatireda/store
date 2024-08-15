@@ -20,10 +20,33 @@ export const createCategory = async (req, res) => {
 };
 
 // Get all categories
-export const getCategories = async (req, res) => {
+export const getAllCategories = async (req, res) => {
   try {
     const categories = await Category.find();
     res.status(200).json(categories);
+  } catch (error) {
+    console.error("Error fetching categories:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+// Get categories
+export const getCategories = async (req, res) => {
+  try {
+    const { page = 1, limit = 8 } = req.query; // Default to page 1 and limit 8 if not provided
+    const skip = (page - 1) * limit;
+
+    const [categories, total] = await Promise.all([
+      Category.find().skip(skip).limit(Number(limit)),
+      Category.countDocuments() // Count the total number of documents
+    ]);
+
+    const totalPages = Math.ceil(total / limit);
+
+    res.status(200).json({
+      categories,
+      totalPages
+    });
   } catch (error) {
     console.error("Error fetching categories:", error);
     res.status(500).json({ message: "Internal server error" });

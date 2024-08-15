@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { axiosClient } from '@/api/axios';
 import { Button } from '@/components/ui/button';
 import { toast } from 'react-toastify';
@@ -8,20 +8,32 @@ import { Plus } from 'lucide-react';
 function Categories() {
     const [categories, setCategories] = useState([]);
     const [selectedCategories, setSelectedCategories] = useState([]);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const [loading, setLoading] = useState(false);
+
+    const fetchCategories = useCallback(async (page = 1) => {
+        setLoading(true);
+        try {
+            const response = await axiosClient.get('/categories', {
+                params: {
+                    page,
+                    limit: 8 // Limit of categories per page
+                }
+            });
+            setCategories(prev => (page === 1 ? response.data.categories : [...prev, ...response.data.categories]));
+            setTotalPages(response.data.totalPages);
+        } catch (error) {
+            console.error(error);
+            toast.error('Error fetching categories');
+        } finally {
+            setLoading(false);
+        }
+    }, []);
 
     useEffect(() => {
-        const fetchCategories = async () => {
-            try {
-                const response = await axiosClient.get('/categories');
-                setCategories(response.data);
-            } catch (error) {
-                console.error(error);
-                toast.error('Error fetching categories');
-            }
-        };
-
-        fetchCategories();
-    }, []);
+        fetchCategories(currentPage);
+    }, [fetchCategories, currentPage]);
 
     const handleSelectChange = (id) => (event) => {
         setSelectedCategories((prev) => {
@@ -49,8 +61,21 @@ function Categories() {
         }
     };
 
+    const handleLoadMore = () => {
+        if (currentPage < totalPages) {
+            setCurrentPage(prevPage => prevPage + 1);
+        }
+    };
+
+    const handleScroll = (event) => {
+        const { scrollTop, clientHeight, scrollHeight } = event.currentTarget;
+        if (scrollHeight - scrollTop <= clientHeight + 50 && !loading) {
+            handleLoadMore();
+        }
+    };
+
     return (
-        <div className="container mx-auto p-6">
+        <div className="container mx-auto p-6" onScroll={handleScroll}>
             <div className='mb-6 flex justify-between items-center'>
                 <div>
                     <h2 className="text-2xl font-semibold">Categories</h2>
@@ -104,6 +129,19 @@ function Categories() {
                     </div>
                 ))}
             </div>
+
+            {loading && <p className="text-center mt-4">Loading...</p>}
+
+            {!loading && currentPage < totalPages && (
+                <div className="text-center mt-4">
+                    <Button
+                        onClick={handleLoadMore}
+                        className="text-blue-600 underline"
+                    >
+                        Load More
+                    </Button>
+                </div>
+            )}
         </div>
     );
 }
