@@ -1,4 +1,6 @@
 import Category from "../models/category.model.js";
+import Product from "../models/product.model.js";
+import cloudinary from '../config/cloudinaryConfig.js';
 
 export const createCategory = async (req, res) => {
   const { title, description } = req.body;
@@ -52,19 +54,20 @@ export const updateCategory = async (req, res) => {
     }
 
     let imgPath = category.imgPath;
-    if (req.file) {
-      if (category.imgPath) {
-        const publicId = category.imgPath.split('/').pop().split('.')[0];
-        await cloudinary.uploader.destroy(publicId);
-      }
-      const result = await cloudinary.uploader.upload(req.file.path);
-      imgPath = result.secure_url;
+
+    // If there's a new image uploaded, delete the old one and update the imgPath
+    if (req.file && category.imgPath) {
+      const publicId = category.imgPath.split('/').pop().split('.')[0];
+      await cloudinary.uploader.destroy(publicId); // Delete old image from Cloudinary
+      imgPath = req.file.path; // Cloudinary secure_url set by multer storage
     }
 
     category.title = title || category.title;
     category.description = description || category.description;
-    category.imgPath = imgPath || category.imgPath;
+    category.imgPath = imgPath;
+
     await category.save();
+
     res.status(200).json({ message: "Category updated successfully", category });
   } catch (error) {
     console.error("Error updating category:", error);

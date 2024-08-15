@@ -3,12 +3,15 @@ import CustomTextInput from '@/components/custom/CustomTextInput';
 import { Button } from '@/components/ui/button';
 import React, { useState, useEffect } from 'react';
 import { axiosClient } from '@/api/axios';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 const CategoryForm = () => {
+    const navigate = useNavigate();
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
-    const [img, setImgPath] = useState(null);
+    const [img, setImg] = useState(null);
+    const [imgPreview, setImgPreview] = useState(null); // State to store the image preview URL
     const [errors, setErrors] = useState({});
     const { id } = useParams();
 
@@ -20,9 +23,10 @@ const CategoryForm = () => {
                     const { title, description, imgPath } = res.data;
                     setTitle(title);
                     setDescription(description);
-                    setImgPath(imgPath);
+                    setImgPreview(imgPath); // Set the existing image path for preview
                 } catch (error) {
-                    console.error('Error fetching category:', error);
+                    console.error(error);
+                    toast.error('Error fetching category');
                 }
             };
             fetchCategory();
@@ -32,8 +36,16 @@ const CategoryForm = () => {
     const validate = () => {
         const newErrors = {};
         if (!title) newErrors.title = 'Title is required';
-        if (!img && id === 'create') newErrors.img = 'Image is required';
+        if (!imgPreview && id === 'create') newErrors.img = 'Image is required';
         return newErrors;
+    };
+
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setImg(file);
+            setImgPreview(URL.createObjectURL(file)); // Create a preview URL for the image
+        }
     };
 
     const handleSubmit = async (e) => {
@@ -67,13 +79,15 @@ const CategoryForm = () => {
                 // Reset form and errors
                 setTitle('');
                 setDescription('');
-                setImgPath(null);
+                setImg(null);
+                setImgPreview(null);
                 setErrors({});
 
-                console.log("Category saved successfully");
-                // Optionally, redirect or show a success message
+                toast.success('Category saved successfully');
+                navigate('/admin/categories');
             } catch (error) {
-                console.error('Error submitting category:', error);
+                console.error(error);
+                toast.error('Error submitting');
             }
         }
     };
@@ -96,12 +110,21 @@ const CategoryForm = () => {
                     error={errors.description}
                     type="text"
                 />
-                <CustomInput
-                    label="Image"
-                    onChange={(e) => setImgPath(e.target.files[0])}
-                    error={errors.img}
-                    type="file"
-                />
+                <div className='flex items-center justify-between'>
+                    <CustomInput
+                        label="Image"
+                        onChange={handleImageChange} // Use the new handler
+                        error={errors.img}
+                        type="file"
+                    />
+                    {imgPreview && (
+                        <img
+                            className='w-80 h-80 aspect-square object-cover'
+                            src={imgPreview}
+                            alt="Selected preview"
+                        />
+                    )}
+                </div>
                 <Button type="submit">{id !== 'create' ? 'Update' : 'Create'}</Button>
             </form>
         </div>
