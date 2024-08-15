@@ -1,19 +1,38 @@
 import CustomInput from '@/components/custom/CustomInput';
 import CustomTextInput from '@/components/custom/CustomTextInput';
 import { Button } from '@/components/ui/button';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { axiosClient } from '@/api/axios';
+import { useParams } from 'react-router-dom';
 
 const CategoryForm = () => {
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [img, setImgPath] = useState(null);
     const [errors, setErrors] = useState({});
+    const { id } = useParams();
+
+    useEffect(() => {
+        if (id !== 'create') {
+            const fetchCategory = async () => {
+                try {
+                    const res = await axiosClient.get(`/categories/${id}`);
+                    const { title, description, imgPath } = res.data;
+                    setTitle(title);
+                    setDescription(description);
+                    setImgPath(imgPath);
+                } catch (error) {
+                    console.error('Error fetching category:', error);
+                }
+            };
+            fetchCategory();
+        }
+    }, [id]);
 
     const validate = () => {
         const newErrors = {};
         if (!title) newErrors.title = 'Title is required';
-        if (!img) newErrors.img = 'Image is required';
+        if (!img && id === 'create') newErrors.img = 'Image is required';
         return newErrors;
     };
 
@@ -26,29 +45,42 @@ const CategoryForm = () => {
             const formData = new FormData();
             formData.append('title', title);
             formData.append('description', description);
-            formData.append('img', img);
+            if (img) formData.append('img', img); // Append file only if a new one is selected
 
             try {
-                const res = await axiosClient.post('/categories', formData, {
-                    headers: {
-                        'Content-Type': 'multipart/form-data',
-                    },
-                });
+                if (id !== 'create') {
+                    // Update existing category
+                    await axiosClient.put(`/categories/${id}`, formData, {
+                        headers: {
+                            'Content-Type': 'multipart/form-data',
+                        },
+                    });
+                } else {
+                    // Create new category
+                    await axiosClient.post('/categories', formData, {
+                        headers: {
+                            'Content-Type': 'multipart/form-data',
+                        },
+                    });
+                }
 
-                console.log(res);
+                // Reset form and errors
                 setTitle('');
                 setDescription('');
                 setImgPath(null);
                 setErrors({});
+
+                console.log("Category saved successfully");
+                // Optionally, redirect or show a success message
             } catch (error) {
-                console.error('Error creating category:', error);
+                console.error('Error submitting category:', error);
             }
         }
     };
 
     return (
         <div>
-            <h2>Create a new category</h2>
+            <h2>{id !== 'create' ? 'Edit Category' : 'Create a new category'}</h2>
             <form onSubmit={handleSubmit}>
                 <CustomInput
                     label="Title"
@@ -70,7 +102,7 @@ const CategoryForm = () => {
                     error={errors.img}
                     type="file"
                 />
-                <Button type="submit">Submit</Button>
+                <Button type="submit">{id !== 'create' ? 'Update' : 'Create'}</Button>
             </form>
         </div>
     );
