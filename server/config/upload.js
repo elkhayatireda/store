@@ -3,8 +3,7 @@ import multer from 'multer';
 import { CloudinaryStorage } from 'multer-storage-cloudinary';
 import cloudinary from './cloudinaryConfig.js';
 
-// Define the maximum file size in bytes (1.5 MB)
-const MAX_FILE_SIZE = 5 * 1024 * 1024; // 1.5 MB
+const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
 // Configure Cloudinary storage
 const storage = new CloudinaryStorage({
