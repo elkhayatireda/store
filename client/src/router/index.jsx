@@ -8,13 +8,11 @@ import HostLayout from '../layouts/HostLayout';
 
 // protectors 
 import AdminAuthRoute from './protectors/AdminAuthRoute';
-
 // pages
 // import AdminDashboard from '@/pages/admin/dashboard';
 import AdminSingnIn from '@/pages/admin/signin';
-import CategoryForm from '@/pages/admin/category';
 import AdminAddProduct from '@/pages/admin/add-product';
-
+import CategoryForm from '@/pages/admin/category';
 // router
 export const router = createBrowserRouter([
     {

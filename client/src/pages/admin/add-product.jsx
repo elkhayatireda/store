@@ -66,8 +66,8 @@ export default function AddProduct() {
         {/*  */}
           <div className="w-full fixed bottom-0 border-[1px] bg-white border-gray-200 right-0 left-0  flex items-center justify-end py-3 ">
             <button 
-                onClick={handleUpdate}
-                className='py-2 px-5 rounded-sm bg-[#302939] text-white mr-5 text-lg'
+              onClick={handleUpdate}
+              className='py-2 px-5 rounded-sm bg-[#302939] text-white mr-5 text-lg'
             >
             save
             </button>
