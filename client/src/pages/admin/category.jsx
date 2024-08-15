@@ -12,8 +12,9 @@ const CategoryForm = () => {
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [img, setImg] = useState(null);
-    const [imgPreview, setImgPreview] = useState(null); // State to store the image preview URL
+    const [imgPreview, setImgPreview] = useState(null);
     const [errors, setErrors] = useState({});
+    const [loading, setLoading] = useState(false);
     const { id } = useParams();
 
     useEffect(() => {
@@ -24,7 +25,7 @@ const CategoryForm = () => {
                     const { title, description, imgPath } = res.data;
                     setTitle(title);
                     setDescription(description);
-                    setImgPreview(imgPath); // Set the existing image path for preview
+                    setImgPreview(imgPath);
                 } catch (error) {
                     console.error(error);
                     toast.error('Error fetching category');
@@ -44,8 +45,21 @@ const CategoryForm = () => {
     const handleImageChange = (e) => {
         const file = e.target.files[0];
         if (file) {
-            setImg(file);
-            setImgPreview(URL.createObjectURL(file)); // Create a preview URL for the image
+            if (file.size > 5 * 1024 * 1024) { // 5MB
+                setErrors(prevErrors => ({
+                    ...prevErrors,
+                    img: 'File size too large. Max size is 5MB.'
+                }));
+                setImg(null);
+                setImgPreview(null);
+            } else {
+                setImg(file);
+                setImgPreview(URL.createObjectURL(file)); // Create a preview URL for the image
+                setErrors(prevErrors => ({
+                    ...prevErrors,
+                    img: null
+                }));
+            }
         }
     };
 
@@ -55,40 +69,33 @@ const CategoryForm = () => {
         if (Object.keys(newErrors).length > 0) {
             setErrors(newErrors);
         } else {
+            setLoading(true);
             const formData = new FormData();
             formData.append('title', title);
             formData.append('description', description);
-            if (img) formData.append('img', img); // Append file only if a new one is selected
+            if (img) formData.append('img', img);
 
             try {
-                if (id !== 'create') {
-                    // Update existing category
-                    await axiosClient.put(`/categories/${id}`, formData, {
-                        headers: {
-                            'Content-Type': 'multipart/form-data',
-                        },
-                    });
-                } else {
-                    // Create new category
-                    await axiosClient.post('/categories', formData, {
-                        headers: {
-                            'Content-Type': 'multipart/form-data',
-                        },
-                    });
-                }
+                const url = id !== 'create' ? `/categories/${id}` : '/categories';
+                await axiosClient.post(url, formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
+                });
 
-                // Reset form and errors
                 setTitle('');
                 setDescription('');
                 setImg(null);
                 setImgPreview(null);
                 setErrors({});
+                setLoading(false);
 
                 toast.success('Category saved successfully');
                 navigate('/admin/categories');
             } catch (error) {
                 console.error(error);
-                toast.error('Error submitting');
+                toast.error(error.response.data.message);
+                setLoading(false);
             }
         }
     };
@@ -134,7 +141,7 @@ const CategoryForm = () => {
                         )}
                         <CustomInput
                             label="Image"
-                            onChange={handleImageChange} // Use the new handler
+                            onChange={handleImageChange}
                             error={errors.img}
                             type="file"
                         />
@@ -144,6 +151,7 @@ const CategoryForm = () => {
                     <Button
                         className='bg-blue-600 text-white'
                         type="submit"
+                        disabled={loading}
                     >
                         {id !== 'create' ? 'Update' : 'Create'}
                     </Button>

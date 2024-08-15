@@ -3,6 +3,10 @@ import multer from 'multer';
 import { CloudinaryStorage } from 'multer-storage-cloudinary';
 import cloudinary from './cloudinaryConfig.js';
 
+// Define the maximum file size in bytes (1.5 MB)
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 1.5 MB
+
+// Configure Cloudinary storage
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
@@ -11,6 +15,26 @@ const storage = new CloudinaryStorage({
   },
 });
 
-const upload = multer({ storage: storage });
+// Configure multer with file size limit
+const upload = multer({
+  storage: storage,
+  limits: {
+    fileSize: MAX_FILE_SIZE, // Set the file size limit here
+  },
+  fileFilter: (req, file, cb) => {
+    // Ensure only allowed image formats are uploaded
+    const allowedTypes = ['image/jpeg', 'image/png'];
+    if (!allowedTypes.includes(file.mimetype)) {
+      return cb(new Error('Invalid file type'), false);
+    }
+
+    // Perform file size check
+    if (file.size > MAX_FILE_SIZE) {
+      return cb(new Error('File size too large. Max size is 5MB'), false);
+    }
+
+    cb(null, true);
+  }
+});
 
 export default upload;
