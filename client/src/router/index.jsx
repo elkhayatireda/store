@@ -12,6 +12,7 @@ import AdminAuthRoute from './protectors/AdminAuthRoute';
 // pages
 // import AdminDashboard from '@/pages/admin/dashboard';
 import AdminSingnIn from '@/pages/admin/signin';
+import AdminAddProduct from '@/pages/admin/add-product';
 
 // router
 export const router = createBrowserRouter([
@@ -30,6 +31,10 @@ export const router = createBrowserRouter([
             {
                 path: "/admin/dashboard",
                 element: <h1>tttttt</h1>
+            },
+            {
+                path: "/admin/products/add",
+                element: <AdminAddProduct />
             },
         ]
     },
