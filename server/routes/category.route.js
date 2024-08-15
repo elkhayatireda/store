@@ -10,7 +10,7 @@ const router = express.Router();
 router.post('/', verifyTokenAdmin, upload.single('img'), createCategory);
 router.get('/', verifyTokenAdmin, getCategories);
 router.get('/:id', verifyTokenAdmin, getCategory);
-router.put('/:id', verifyTokenAdmin, updateCategory);
+router.put('/:id', verifyTokenAdmin, upload.single('img'), updateCategory);
 router.delete('/:id', verifyTokenAdmin, deleteCategory);
 
 export default router;
