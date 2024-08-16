@@ -47,7 +47,7 @@ export function CategoriesTable({ columns, data }) {
 
     return (
         <div>
-            <div className={`flex items-center ${table.getFilteredSelectedRowModel().rows.length > 0 ? 'justify-between' : 'justify-end'} py-4`}>
+            <div className={`my-2 flex flex-col sm:flex-row items-start sm:items-center ${table.getFilteredSelectedRowModel().rows.length > 0 ? 'justify-between' : 'justify-end'}`}>
                 {
                     table.getFilteredSelectedRowModel().rows.length > 0 &&
                     <Button

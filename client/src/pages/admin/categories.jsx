@@ -9,7 +9,7 @@ function Categories() {
 
     return (
         <div>
-            <div className='mb-6 flex justify-between items-center'>
+            <div className=' flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-0'>
                 <div>
                     <h2 className="text-2xl font-semibold">Categories</h2>
                     <p className='text-sm'>Here you can manage the categories in your store</p>
