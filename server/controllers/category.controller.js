@@ -1,4 +1,6 @@
 import Category from "../models/category.model.js";
+import Product from "../models/product.model.js";
+import cloudinary from '../config/cloudinaryConfig.js';
 
 export const createCategory = async (req, res) => {
   const { title, description } = req.body;
@@ -18,10 +20,33 @@ export const createCategory = async (req, res) => {
 };
 
 // Get all categories
-export const getCategories = async (req, res) => {
+export const getAllCategories = async (req, res) => {
   try {
     const categories = await Category.find();
     res.status(200).json(categories);
+  } catch (error) {
+    console.error("Error fetching categories:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+// Get categories
+export const getCategories = async (req, res) => {
+  try {
+    const { page = 1, limit = 8 } = req.query; // Default to page 1 and limit 8 if not provided
+    const skip = (page - 1) * limit;
+
+    const [categories, total] = await Promise.all([
+      Category.find().skip(skip).limit(Number(limit)),
+      Category.countDocuments() // Count the total number of documents
+    ]);
+
+    const totalPages = Math.ceil(total / limit);
+
+    res.status(200).json({
+      categories,
+      totalPages
+    });
   } catch (error) {
     console.error("Error fetching categories:", error);
     res.status(500).json({ message: "Internal server error" });
@@ -52,19 +77,20 @@ export const updateCategory = async (req, res) => {
     }
 
     let imgPath = category.imgPath;
-    if (req.file) {
-      if (category.imgPath) {
-        const publicId = category.imgPath.split('/').pop().split('.')[0];
-        await cloudinary.uploader.destroy(publicId);
-      }
-      const result = await cloudinary.uploader.upload(req.file.path);
-      imgPath = result.secure_url;
+
+    // If there's a new image uploaded, delete the old one and update the imgPath
+    if (req.file && category.imgPath) {
+      const publicId = category.imgPath.split('/').pop().split('.')[0];
+      await cloudinary.uploader.destroy(publicId); // Delete old image from Cloudinary
+      imgPath = req.file.path; // Cloudinary secure_url set by multer storage
     }
 
     category.title = title || category.title;
     category.description = description || category.description;
-    category.imgPath = imgPath || category.imgPath;
+    category.imgPath = imgPath;
+
     await category.save();
+
     res.status(200).json({ message: "Category updated successfully", category });
   } catch (error) {
     console.error("Error updating category:", error);
@@ -73,25 +99,57 @@ export const updateCategory = async (req, res) => {
 };
 
 // Delete a category
-export const deleteCategory = async (req, res) => {
+// export const deleteCategory = async (req, res) => {
+//   try {
+//     const category = await Category.findById(req.params.id);
+//     if (!category) {
+//       return res.status(404).json({ message: "Category not found" });
+//     }
+
+//     if (category.imgPath) {
+//       const publicId = category.imgPath.split('/').pop().split('.')[0];
+//       await cloudinary.uploader.destroy(publicId);
+//     }
+
+//     await Product.updateMany({ categoryId: category._id }, { $set: { categoryId: null } });
+
+//     await Category.findByIdAndDelete(req.params.id);
+
+//     res.status(200).json({ message: "Category deleted successfully" });
+//   } catch (error) {
+//     console.error("Error deleting category:", error);
+//     res.status(500).json({ message: "Internal server error" });
+//   }
+// };
+
+export const deleteCategories = async (req, res) => {
   try {
-    const category = await Category.findById(req.params.id);
-    if (!category) {
-      return res.status(404).json({ message: "Category not found" });
+    const ids = req.body.ids;
+    if (!ids || !Array.isArray(ids)) {
+      return res.status(400).json({ message: "Invalid request body" });
     }
 
-    if (category.imgPath) {
-      const publicId = category.imgPath.split('/').pop().split('.')[0];
-      await cloudinary.uploader.destroy(publicId);
+    const categories = await Category.find({ _id: { $in: ids } });
+
+    if (categories.length === 0) {
+      return res.status(404).json({ message: "No categories found" });
     }
 
-    await Product.updateMany({ categoryId: category._id }, { $set: { categoryId: null } });
+    for (const category of categories) {
+      if (category.imgPath) {
+        const publicId = category.imgPath.split('/').pop().split('.')[0];
+        await cloudinary.uploader.destroy(publicId);
+      }
 
-    await Category.findByIdAndDelete(req.params.id);
+      await Product.updateMany({ categoryId: category._id }, { $set: { categoryId: null } });
+    }
 
-    res.status(200).json({ message: "Category deleted successfully" });
+    await Category.deleteMany({ _id: { $in: ids } });
+
+    res.status(200).json({ message: "Categories deleted successfully" });
   } catch (error) {
-    console.error("Error deleting category:", error);
+    console.error("Error deleting categories:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 };
+

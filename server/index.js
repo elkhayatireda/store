@@ -38,10 +38,23 @@ server.listen(process.env.PORT, (error) => {
   }
 });
 
-
 app.use('/api/admin', adminRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/products', productRoutes);
 
+// server.js (or your main server file)
+app.use((err, req, res, next) => {
+  if (err) {
+    console.error(err.message); // Log the error
+    if (err.message.includes('File size too large')) {
+      return res.status(400).json({ message: 'File size too large. Max size is 5MB.' });
+    }
+    if (err.code === 'LIMIT_FILE_SIZE') {
+      return res.status(400).json({ message: 'File size too large. Max size is 5MB.' });
+    }
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+  next();
+});
 
 export default app;

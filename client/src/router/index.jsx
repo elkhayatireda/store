@@ -13,6 +13,7 @@ import AdminAuthRoute from './protectors/AdminAuthRoute';
 import AdminSingnIn from '@/pages/admin/signin';
 import AdminAddProduct from '@/pages/admin/add-product';
 import CategoryForm from '@/pages/admin/category';
+import Categories from '@/pages/admin/categories';
 // router
 export const router = createBrowserRouter([
     {
@@ -29,6 +30,14 @@ export const router = createBrowserRouter([
         children: [
             {
                 path: "/admin/dashboard",
+                element: <div>dashboard</div>
+            },
+            {
+                path: "/admin/categories",
+                element: <Categories />
+            },
+            {
+                path: "/admin/categories/:id",
                 element: <CategoryForm />
             },
             {
