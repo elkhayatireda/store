@@ -9,7 +9,7 @@ export default function SideBar({ children, expanded, setExpanded }) {
 
     return (
         <aside className="px-3 py-1 side-nav h-screen w-fit fixed top-0 left-0 z-50 shadow bg-[#202939] text-white">
-            <nav className="h-full flex flex-col bg-background">
+            <nav className="h-full flex flex-col">
                 <div className="flex justify-between items-center">
                     <h1
                         className={`text-xl font-semibold overflow-hidden transition-all ${expanded ? "w-32" : "w-0"}`}
@@ -18,7 +18,7 @@ export default function SideBar({ children, expanded, setExpanded }) {
                     </h1>
                     <Button
                         variant='ghost'
-                        className='p-1'
+                        className='p-1 hover:bg-transparent hover:text-white hover:opacity-80'
                         onClick={() => setExpanded((curr) => !curr)}
                     >
                         {expanded ? <X /> : <LayoutDashboard />}
@@ -41,7 +41,7 @@ export function SidebarItem({ icon, text, location, alert }) {
             to={location}
             className={`my-3 relative flex items-center justify-center font-medium rounded-md cursor-pointer transition-colors group`}
         >
-            <div className={`p-1 group flex items-center gap-1 ${expanded ? "w-full" : "w-fit"} rounded hover:bg-blue-50 hover:text-blue-950`}>
+            <div className={`link p-1 group flex items-center gap-1 ${expanded ? "w-full" : "w-fit"} rounded hover:bg-blue-50 hover:text-blue-950`}>
                 {icon}
                 <span
                     className={`overflow-hidden transition-all ${expanded ? "pl-3" : "hidden"}`}
@@ -62,7 +62,7 @@ export function SidebarItem({ icon, text, location, alert }) {
           card whitespace-nowrap absolute left-full px-2 py-1 ml-6
           bg-secondary text-primary text-sm
           invisible opacity-20 translate-x-3 transition-all
-          group-hover:visible group-hover:opacity-100 group-hover:translate-x-0 bg-blue-950 text-white rounded`}
+          group-hover:visible group-hover:opacity-100 group-hover:translate-x-0 rounded`}
                 >
                     {text}
                 </div>

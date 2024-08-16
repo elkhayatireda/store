@@ -18,7 +18,7 @@
   --popover: 0 0% 100%;
   --popover-foreground: 0 0% 3.9%;
 
-  --primary: 245 82% 67%;
+  --primary: 226 57% 21%;
   --primary-foreground: 0 0% 98%;
 
   --secondary: 198 100% 87%;
@@ -97,11 +97,11 @@ input:-webkit-autofill:active {
   transition: background-color 5000s ease-in-out 5000s;
 }
 
-.side-nav .active div {
+.side-nav .active .link {
   @apply bg-white text-[#202939];
 }
 
-.side-nav .active .card {
+.side-nav .card {
   @apply bg-blue-950 text-white;
 }
 
