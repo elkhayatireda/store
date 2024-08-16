@@ -9,39 +9,39 @@ const productSchema = mongoose.Schema(
         },
         title: {
             type: String,
-            required: true,
+            
         },
         comparePrice: {
             type: Number,
-            required: true,
+            
         },
         price: {
             type: Number,
-            required: true,
+            
         },
         url: {
             type: String,
-            required: true,
+            
         },
         images: {
             type: [String],
-            required: true,
+            
         },
         description: {
             type: String,
-            required: true,
+            
         },
         variants: [
             {
                 name: {
                     type: String,
-                    required: true,
+                    
                 },
                 values: [
                     {
                         value: {
                             type: String,
-                            required: true,
+                            
                         },
                         img: {
                             type: String,

@@ -2,14 +2,22 @@ import Product from "../models/product.model.js";
 
 // Create a new product
 export const createProduct = async (req, res) => {
-  const { categoryId, title, comparePrice, price, url, images, description, variants } = req.body;
   try {
-    const newProduct = new Product({ categoryId, title, comparePrice, price, url, images, description, variants });
-    await newProduct.save();
-    res.status(201).json({ message: "Product created successfully", newProduct });
+    // const { productTitle, variants, combinations } = req.body;
+    const imageFiles = req.files;
+
+    // Process your form data and save it to the database
+    // Here, you can associate the image files with their corresponding combinations
+    imageFiles.forEach((combination, index) => {
+        const imageFile = imageFiles[index];
+        console.log(imageFile.path);
+    });
+
+ 
+ 
+    res.status(201);
   } catch (error) {
-    console.error("Error creating product:", error);
-    res.status(500).json({ message: "Internal server error" });
+      res.status(500).json({ error: 'An error occurred while saving the product' });
   }
 };
 
