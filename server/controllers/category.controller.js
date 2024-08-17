@@ -5,17 +5,24 @@ import cloudinary from '../config/cloudinaryConfig.js';
 export const createCategory = async (req, res) => {
   const { title, description } = req.body;
   try {
+    // Check if a category with the same title already exists
+    const existingCategory = await Category.findOne({ title });
+    if (existingCategory) {
+      return res.status(400).json({ message: "Category title already exists" });
+    }
+
     let imgPath = null;
     if (req.file) {
       imgPath = req.file.path;
     }
 
+    // Create and save the new category
     const newCategory = new Category({ title, description, imgPath });
     await newCategory.save();
     res.status(201).json({ message: "Category created successfully, " + imgPath, newCategory });
   } catch (error) {
     console.error("Error creating category:", error);
-    res.status(500).json({ message: "Internal server error" });
+    res.status(500).json({ message: "Error while saving category" });
   }
 };
 
@@ -79,15 +86,26 @@ export const updateCategory = async (req, res) => {
       return res.status(404).json({ message: "Category not found" });
     }
 
+    // Check if the new title already exists (excluding the current category)
+    if (title && title !== category.title) {
+      const existingCategory = await Category.findOne({ title });
+      if (existingCategory) {
+        return res.status(400).json({ message: "Error while updating category" });
+      }
+    }
+
     let imgPath = category.imgPath;
 
     // If there's a new image uploaded, delete the old one and update the imgPath
-    if (req.file && category.imgPath) {
-      const publicId = category.imgPath.split('/').pop().split('.')[0];
-      await cloudinary.uploader.destroy(publicId); // Delete old image from Cloudinary
+    if (req.file) {
+      if (category.imgPath) {
+        const publicId = category.imgPath.split('/').pop().split('.')[0];
+        await cloudinary.uploader.destroy(publicId); // Delete old image from Cloudinary
+      }
       imgPath = req.file.path; // Cloudinary secure_url set by multer storage
     }
 
+    // Update category properties
     category.title = title || category.title;
     category.description = description || category.description;
     category.imgPath = imgPath;

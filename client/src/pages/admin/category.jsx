@@ -119,7 +119,7 @@ const CategoryForm = () => {
                 navigate('/admin/categories');
             } catch (error) {
                 console.error(error);
-                toast.error('Error saving category');
+                toast.error(error.response.data.message);
                 setLoading(false);
             }
         }
