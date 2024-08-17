@@ -31,28 +31,11 @@ const productSchema = mongoose.Schema(
             type: String,
             
         },
-        variants: [
-            {
-                name: {
-                    type: String,
-                    
-                },
-                values: [
-                    {
-                        value: {
-                            type: String,
-                            
-                        },
-                        img: {
-                            type: String,
-                        },
-                        price: {
-                            type: Number,
-                        }
-                    }
-                ]
-            }
-        ],
+        isVariant: {
+            type: Boolean,
+        },
+        variants: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Variant' }], // Array of variant references
+        combinations: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Combination' }]
     },
     {
         timestamps: true,

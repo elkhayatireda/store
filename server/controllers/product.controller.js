@@ -1,24 +1,85 @@
-import Product from "../models/product.model.js";
-
+import Product from '../models/product.model.js';
+import Variant from '../models/variant.model.js';
+import Combination from '../models/combination.model.js';
 // Create a new product
 export const createProduct = async (req, res) => {
   try {
-    // const { productTitle, variants, combinations } = req.body;
+    const { 
+        // categoryId, 
+        // title, 
+        // comparePrice, 
+        // price, 
+        // slug,  
+        description, 
+        isVariant, 
+    } = req.body;
+      const  variants =  JSON.parse(req.body.variants);
+      const  combinations =  JSON.parse(req.body.combinations);
+
     const imageFiles = req.files;
 
-    // Process your form data and save it to the database
-    // Here, you can associate the image files with their corresponding combinations
+    let images = [];
     imageFiles.forEach((combination, index) => {
         const imageFile = imageFiles[index];
-        console.log(imageFile.path);
+        images.push(imageFile.path);
+    });
+    let newProduct = new Product({
+        // categoryId,
+        // title,
+        // comparePrice,
+        // price,
+        // slug,
+        images,
+        description,
+        isVariant
     });
 
- 
- 
-    res.status(201);
-  } catch (error) {
-      res.status(500).json({ error: 'An error occurred while saving the product' });
-  }
+    if (isVariant) {
+        console.log('good')
+        newProduct = await newProduct.save();
+        // Save each variant 
+        const variantDocs = await Promise.all(variants.map(async (variant) => {
+            const newVariant = new Variant({
+                product: newProduct._id,
+                name: variant.variantName,
+                values: variant.values
+            });
+            return await newVariant.save();
+        }));
+
+        // Save each combination
+        const combinationDocs = await Promise.all(combinations.map(async (combination) => {
+          const variantValues = variantDocs.map(variantDoc => variantDoc._id);
+          combination.variantIndices.forEach((elem) => {
+              elem.variantIndex = variantValues[elem.variantIndex];
+          });
+          const newCombination = new Combination({
+              product: newProduct._id, 
+              combination: combination.combination,
+              variantValues: combination.variantIndices, 
+              price: combination.price,
+              comparePrice: combination.comparePrice,
+              image: images[combination.img] // Assuming image is an index
+          });
+          return await newCombination.save();
+      }));
+      
+
+        // Update the product with references to variants and combinations
+        newProduct.variants = variantDocs.map(variantDoc => variantDoc._id);
+        newProduct.combinations = combinationDocs.map(combinationDoc => combinationDoc._id);
+        await newProduct.save();
+
+    } else {
+        // If the product does not have variants, just save it as is
+        newProduct = await newProduct.save();
+    }
+
+    res.status(201).json(newProduct);
+} catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to create product' });
+}
 };
 
 // Get all products

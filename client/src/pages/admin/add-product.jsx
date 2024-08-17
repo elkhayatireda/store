@@ -1,10 +1,10 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { axiosClient } from '../../api/axios'; // Assuming you're using axios for API requests
 import {  toast } from 'react-toastify';
 import { authContext } from '../../contexts/AuthWrapper';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
-import { ImageUp, X } from 'lucide-react'; 
+import { ImageUp, X, Image  } from 'lucide-react'; 
 
 
 
@@ -13,13 +13,11 @@ export default function AddProduct() {
   const [value, setValue] = useState('');
   const [formData, setFormData] = useState({
     productTitle: '',
-    slug: '',
     description: '',
     visible: false,
     productCategory: '',
-    confirmPassword: '',
-    variant: false,
-    differentPrice: false, // Added to track if the product has variants
+    isVariant: false,
+    differentPrice: false, 
     price: '', 
     comparePrice: '',
     variantCount: 0, 
@@ -29,16 +27,28 @@ export default function AddProduct() {
     
   });
   const [isPopupVisible, setPopupVisible] = useState(false);
+  const [categories, setCategories] = useState([]);
   const [currentCombinationIndex, setCurrentCombinationIndex] = useState(null);
-
+   const fetchCategories = async () => {
+      try {
+        const response = await axiosClient.get('/api/categories/getAll');
+        setCategories(response.data);
+      } catch (error) {
+        console.error(error);
+        toast.error('Error fetching categories');
+      }
+    };
+  useEffect(() => {
+    fetchCategories();
+}, []);
   const handleImageClick = (index) => {
     setCurrentCombinationIndex(index);
     setPopupVisible(true);
   };
 
-  const handleImageSelect = (image) => {
+  const handleImageSelect = (imageIndex) => {
     const newCombinations = [...formData.combinations];
-    newCombinations[currentCombinationIndex].img = image;
+    newCombinations[currentCombinationIndex].img = imageIndex;
     setFormData({
       ...formData,
       combinations: newCombinations,
@@ -113,12 +123,16 @@ export default function AddProduct() {
 
     // Append the text data
     formDataToSend.append('productTitle', formData.productTitle);
+    formDataToSend.append('description', formData.description);
+    formDataToSend.append('visible', formData.visible);
+    formDataToSend.append('productCategory', formData.productCategory);
+    formDataToSend.append('isVariant', formData.isVariant);
     formDataToSend.append('variants', JSON.stringify(formData.variants));
     formDataToSend.append('combinations', JSON.stringify(formData.combinations));
 
     // Append images
     formData.images.forEach((image, index) => {
-        formDataToSend.append('images', image); // Ensure your backend handles arrays of images
+        formDataToSend.append('images', image); 
     });
 
     try {
@@ -147,30 +161,54 @@ export default function AddProduct() {
     );
   };
 
+  // const generateCombinations = () => {
+  //   const variantValues = formData.variants.map((variant) => variant.values);
+  //   const combinations = cartesianProduct(variantValues);
+  //   let formattedCombinations = [];
+  //   if(formData.differentPrice){
+  //       formattedCombinations = combinations.map((comb) => ({
+  //       combination: comb.join(' / '),
+  //       price: '',
+  //       comparePrice: '',
+  //     }));
+  //   }else{
+  //       formattedCombinations = combinations.map((comb) => ({
+  //       combination: comb.join(' / '),
+  //       price: formData.price,
+  //       comparePrice: formData.comparePrice,
+  //     }));
+  //   }
+    
+  //   setFormData({
+  //     ...formData,
+  //     combinations: formattedCombinations,
+  //   });
+  // };
   const generateCombinations = () => {
-    const variantValues = formData.variants.map((variant) => variant.values);
-    const combinations = cartesianProduct(variantValues);
-    let formattedCombinations = [];
-    if(formData.differentPrice){
-        formattedCombinations = combinations.map((comb) => ({
-        combination: comb.join(' / '),
-        price: '',
-        comparePrice: '',
-      }));
-    }else{
-        formattedCombinations = combinations.map((comb) => ({
-        combination: comb.join(' / '),
-        price: formData.price,
-        comparePrice: formData.comparePrice,
-      }));
-    }
+    const variantIndices = formData.variants.map((variant, variantIndex) => 
+        variant.values.map((_, valueIndex) => ({ variantIndex, valueIndex }))
+    );
+    
+    const combinations = cartesianProduct(variantIndices);
+    
+    let formattedCombinations = combinations.map((comb) => {
+        const combination = comb.map(({ variantIndex, valueIndex }) => 
+            formData.variants[variantIndex].values[valueIndex]
+        ).join(' / ');
+        
+        return {
+            combination,
+            price: formData.differentPrice ? '' : formData.price,
+            comparePrice: formData.differentPrice ? '' : formData.comparePrice,
+            variantIndices: comb
+        };
+    });
     
     setFormData({
-      ...formData,
-      combinations: formattedCombinations,
+        ...formData,
+        combinations: formattedCombinations,
     });
-  };
-
+};
   const handleCombinationChange = (index, field, value) => {
     const newCombinations = [...formData.combinations];
     newCombinations[index][field] = value;
@@ -199,11 +237,7 @@ const handleFile = (event) => {
     images: newImages,
   });
 };
-  // useEffect(()=>{
-  //   if(userContext.user === undefined){
-  //     userContext.getAdmin();
-  //   }
-  // },[userContext.user]);
+ 
   return (
     <div className='flex flex-col pt-5   pr-5 px-10 relative '>
       <div className="w-full fixed bottom-0 border-[1px] bg-white border-gray-200 right-0 left-0  flex items-center justify-end py-3 ">
@@ -219,7 +253,7 @@ const handleFile = (event) => {
       </div>
       <div>
         <div className='flex gap-10 pb-32 w-full items-start justify-center '>
-          <div className="flex flex-col  basis-2/3 gap-10 w-full border-[2px] border-gray-500 p-3 rounded-xl">
+          <div className="flex flex-col  basis-2/3 gap-10 w-full border-[2px] border-gray-100 p-5 rounded-xl">
               {/* <label htmlFor="productTitle" className='block text-[#000] text-md mb-1'>Product title</label> */}
               <input 
                   type="text" 
@@ -250,17 +284,6 @@ const handleFile = (event) => {
                   onChange={handleFile}
               />
             </div>
-            <div className="flex items-center justify-start gap-2">
-              <input 
-                  type="checkbox" 
-                  id="variant" 
-                  className=''
-                  value={formData.variant}
-                  checked={formData.variant}
-                  onChange={handleChange}
-              />
-              <label htmlFor='variant' className='text-gray-800 text-md'>the product has variants? </label>
-            </div>
             {!formData.differentPrice && (
             <div className='flex items-center justify-start gap-5 '>
             <input 
@@ -281,41 +304,65 @@ const handleFile = (event) => {
             />
             </div>
           )}
-            {formData.variant && (<>
-              <div className="flex items-center justify-start gap-2">
-                <input 
-                    type="checkbox" 
-                    id="differentPrice" 
-                    className=''
-                    checked={formData.differentPrice} // Use checked for checkboxes
-                    onChange={handleChange}
-                />
-                <label htmlFor='differentPrice' className='text-gray-800 text-md'>prices depends on variants?</label>
-              </div>
-          
             <div className="flex items-center justify-start gap-2">
-             <button className='w-1/3 py-3 bg-green-500 text-white' onClick={handleAddVariant}>Add Variant</button>
+              <div className="flex items-center justify-start gap-4 w-full">
+                <label class="inline-flex items-center cursor-pointer outline-none" htmlFor='isVariant'>
+                  <input 
+                    type="checkbox" 
+                    className="sr-only peer" 
+                    id="isVariant" 
+                    value={formData.isVariant}
+                    checked={formData.isVariant}
+                    onChange={handleChange}/>
+                  <div class="relative w-11 h-6 bg-gray-200 rounded-full peer  peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-green-500"></div>
+                  <span class="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">the product has variants?</span>
+                </label>
+                {
+                  formData.isVariant && 
+                  <>
+                    <label class="inline-flex items-center cursor-pointer outline-none" htmlFor='differentPrice'>
+                      <input 
+                        type="checkbox" 
+                        className="sr-only peer" 
+                        id="differentPrice" 
+                        value={formData.differentPrice}
+                        checked={formData.differentPrice}
+                        onChange={handleChange}/>
+                      <div class="relative w-11 h-6 bg-gray-200 rounded-full peer  peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-green-500"></div>
+                      <span class="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">prices depends on variants?</span>
+                    </label>
+                    <div className="flex items-center justify-start">
+                        <button className='w-full py-3 px-10 bg-green-500 text-white' onClick={handleAddVariant}>Add Variant</button>
+                    </div>
+                  </>
+                }
+              </div>
             </div>
+            
+            {formData.isVariant && (<>
+              
+          
+            
             {formData.variants.map((variant, index) => (
             <div key={index} className="flex flex-col border-2 border-gray-200 rounded-xl p-3 mt-3">
               <div className="flex items-center justify-between gap-2">
                 <input
                   type="text"
                   placeholder="Variant Name"
-                  className="py-2 pl-5 w-full outline-none border-2 border-gray-200 rounded-xl basis-2/5"
+                  className="py-2 pl-5 w-full outline-none border-2 border-gray-200 rounded basis-2/5"
                   value={variant.variantName}
                   onChange={(e) => handleVariantChange(index, 'variantName', e.target.value)}
                 />
                 <input
                   type="text"
                   placeholder="Add Variant Value"
-                  className="py-2 pl-5 w-full outline-none border-2 border-gray-200 rounded-xl basis-2/5"
+                  className="py-2 pl-5 w-full outline-none border-2 border-gray-200 rounded basis-2/5"
                   value={variant.newValue}
                   onChange={(e) => handleVariantChange(index, 'newValue', e.target.value)}
                   onKeyDown={(e) => handleKeyDown(e, index)}
                 />
                 <button
-                  className="py-[9px] bg-[#302939] text-white basis-1/5 rounded-xl"
+                  className="py-[9px] bg-[#302939] text-white basis-1/5 rounded"
                   onClick={() => handleAddValue(index)}
                  
                 >
@@ -346,9 +393,13 @@ const handleFile = (event) => {
   <div className="mt-5" >
     <h3>Combinations</h3>
     {formData.combinations.map((comb, index) => (
-      <div key={index} className="flex items-center justify-start gap-5 mt-3">
-        <div className="w-16 h-16 rounded border-[1px] border-gray-300 flex items-center justify-center" onClick={() => handleImageClick(index)}>
-          <img src={comb.img} alt="" className="w-full" />
+      <div key={index} className="flex items-center justify-start gap-5 mt-3 py-4 border-[1px] border-gray-300 px-5 rounded">
+        <div className="w-12 h-12 rounded border-[1px] border-gray-300 flex items-center justify-center bg-gray-100" onClick={() => handleImageClick(index)}>
+          {typeof comb.img === 'number'   ? 
+          <img src={URL.createObjectURL(formData.images[comb.img])} alt="" className="w-full" />
+          :
+          <Image color='gray' />
+          }
         </div>
         {isPopupVisible && (
         <div className="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50">
@@ -357,12 +408,11 @@ const handleFile = (event) => {
             &times;
           </button>
           <div className="grid grid-cols-3 gap-5 p-5">
-           
             {formData.images.map((file, index) => (
               <div
               key={index}
               className="w-24 h-24 rounded border-[1px] border-gray-300 flex items-center justify-center cursor-pointer"
-              onClick={() => handleImageSelect(URL.createObjectURL(file))}
+              onClick={() => handleImageSelect(index)}
             >
           <img
             key={index}
@@ -376,7 +426,7 @@ const handleFile = (event) => {
         </div>
       </div>
       )}
-        <p className="w-full basis-2/5">{comb.combination}</p>
+        <p className="max-w-24 min-w-24">{comb.combination}</p>
         <input
           type="text"
           placeholder="Price"
@@ -395,25 +445,12 @@ const handleFile = (event) => {
         />
       </div>
     ))}
-
-{formData && (
-  <div className="mt-5 bg-gray-100 p-5 rounded-lg">
-    <h3 className="text-xl font-bold mb-3">Form Data</h3>
-    <pre className="whitespace-pre-wrap">
-      {JSON.stringify(formData, null, 2)}
-    </pre>
   </div>
 )}
-  
-  </div>
-)}
-
             </>
           )}
-        
-
           </div>
-          <div className="flex flex-col basis-1/3 border-[2px] border-gray-500 p-3 rounded-xl gap-5">
+          <div className="flex flex-col basis-1/3 border-[2px] border-gray-100 p-3 rounded-xl gap-5">
             <div className="flex items-center justify-start gap-5 border-2 border-gray-200 rounded-xl p-3">
               <input 
                   type="checkbox" 
@@ -431,10 +468,9 @@ const handleFile = (event) => {
                 onChange={handleChange}
             >
                 <option value="">Select a category</option>
-                <option value="electronics">Electronics</option>
-                <option value="fashion">Fashion</option>
-                <option value="books">Books</option>
-                <option value="home">Home</option>
+                {categories.map((elem)=>{
+                  <option value={elem.title}>{elem.title}</option>
+                })}
             </select>
           </div>
         </div>
