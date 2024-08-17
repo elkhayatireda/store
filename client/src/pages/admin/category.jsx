@@ -181,7 +181,9 @@ const CategoryForm = () => {
                             }
                             <div className='p-2'>
                                 <p className='font-medium capitalize'>{title || 'Title'}</p>
-                                <p className='text-xs text-gray-500'>{description || 'Description'}</p>
+                                <p className='text-xs text-gray-500 max-w-36 overflow-x-auto'>
+                                    {description.length > 100 ? `${description.substring(0, 100)}...` : description || 'Description'}
+                                </p>
                             </div>
                         </div>
                     </div>

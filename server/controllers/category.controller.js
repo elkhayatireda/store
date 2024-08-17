@@ -22,13 +22,39 @@ export const createCategory = async (req, res) => {
 // Get all categories
 export const getCategories = async (req, res) => {
   try {
-    const categories = await Category.find();
-    res.status(200).json(categories);
+    // Aggregate categories with the count of products
+    const categoriesWithProductCounts = await Category.aggregate([
+      {
+        $lookup: {
+          from: 'products', // The name of your products collection
+          localField: '_id',
+          foreignField: 'categoryId',
+          as: 'products'
+        }
+      },
+      {
+        $addFields: {
+          productCount: { $size: '$products' }
+        }
+      },
+      {
+        $project: {
+          _id: 1,
+          title: 1,
+          description: 1,
+          imgPath: 1,
+          productCount: 1
+        }
+      }
+    ]);
+
+    res.status(200).json(categoriesWithProductCounts);
   } catch (error) {
     console.error("Error fetching categories:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 };
+
 
 // Get a single category by ID
 export const getCategory = async (req, res) => {
