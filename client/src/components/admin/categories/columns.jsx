@@ -43,6 +43,7 @@ const categoryColumns = [
         header: ({ column }) => {
             return (
                 <Button
+                    className='p-0'
                     variant="ghost"
                     onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
                 >
@@ -66,12 +67,25 @@ const categoryColumns = [
     {
         accessorKey: "description",
         header: "Description",
+        cell: ({ row }) => {
+            const desc = row.original.description;
+            return (
+                <span className="text-xs block truncate max-w-xs" title={desc}>
+                    {desc.length > 100 ? `${desc.substring(0, 100)}...` : desc}
+                </span>
+            );
+        },
+    },
+    {
+        accessorKey: "productCount",
+        header: "Products",
     },
     {
         accessorKey: "createdAt",
         header: ({ column }) => {
             return (
                 <Button
+                    className='p-0'
                     variant="ghost"
                     onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
                 >
@@ -80,6 +94,14 @@ const categoryColumns = [
                 </Button>
             )
         },
+        cell: ({ row }) => {
+            const date = new Date(row.original.createdAt)
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            const formattedDate = date.toLocaleDateString('fr-FR', options);
+            return <div>
+                {formattedDate}
+            </div>
+        }
     },
     {
         id: "actions",
