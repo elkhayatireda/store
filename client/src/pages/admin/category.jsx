@@ -1,12 +1,13 @@
-import CustomInput from '@/components/custom/CustomInput';
-import CustomTextInput from '@/components/custom/CustomTextInput';
-import { Button } from '@/components/ui/button';
 import React, { useState, useEffect } from 'react';
+import { useDropzone } from 'react-dropzone';
+import imageCompression from 'browser-image-compression'; // Import the library
 import { axiosClient } from '@/api/axios';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { ChevronLeft } from 'lucide-react';
-import imageCompression from 'browser-image-compression'; // Import the library
+import { ChevronLeft, CloudUpload } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import CustomInput from '@/components/custom/CustomInput';
+import CustomTextInput from '@/components/custom/CustomTextInput';
 
 const CategoryForm = () => {
     const navigate = useNavigate();
@@ -43,8 +44,8 @@ const CategoryForm = () => {
         return newErrors;
     };
 
-    const handleImageChange = async (e) => {
-        const file = e.target.files[0];
+    const handleDrop = async (acceptedFiles) => {
+        const file = acceptedFiles[0];
         if (file) {
             try {
                 if (file.size > 5 * 1024 * 1024) { // 5MB
@@ -80,6 +81,12 @@ const CategoryForm = () => {
             }
         }
     };
+
+    const { getRootProps, getInputProps } = useDropzone({
+        onDrop: handleDrop,
+        accept: 'image/*',
+        maxSize: 5 * 1024 * 1024 // 5MB
+    });
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -132,8 +139,8 @@ const CategoryForm = () => {
                 </Link>
             </div>
             <form className='mt-7' onSubmit={handleSubmit}>
-                <div className='w-full flex justify-center items-center gap-8'>
-                    <div className='w-full'>
+                <div className='w-full flex flex-col sm:flex-row justify-center items-center gap-8'>
+                    <div>
                         <CustomInput
                             label="Title"
                             value={title}
@@ -148,21 +155,35 @@ const CategoryForm = () => {
                             error={errors.description}
                             type="text"
                         />
+                        <div
+                            {...getRootProps({ className: 'dropzone' })}
+                            className='border-2 border-dashed border-gray-300 p-4 text-center'
+                        >
+                            <input {...getInputProps()} />
+                            <div className='text-gray-500 flex flex-col items-center justify-center'>
+                                <CloudUpload size={90} />
+                                <p>Drag & drop an image here, or click to select one</p>
+                            </div>
+                        </div>
+                        {errors.img && <p className='text-red-500'>{errors.img}</p>}
                     </div>
-                    <div className='w-full'>
-                        {imgPreview && (
-                            <img
-                                className='w-24 h-24 aspect-square object-cover rounded-sm'
-                                src={imgPreview}
-                                alt="Selected preview"
-                            />
-                        )}
-                        <CustomInput
-                            label="Image"
-                            onChange={handleImageChange}
-                            error={errors.img}
-                            type="file"
-                        />
+                    <div>
+                        <h4 className='font-medium'>Preview</h4>
+                        <div className='rounded border shadow-sm'>
+                            {imgPreview ? (
+                                <img
+                                    className='w-44 h-44 aspect-square object-cover rounded-sm rounded-b-none'
+                                    src={imgPreview}
+                                    alt="Selected preview"
+                                />
+                            ) :
+                                <div className='bg-gray-200 w-44 h-44'></div>
+                            }
+                            <div className='p-2'>
+                                <p className='font-medium capitalize'>{title || 'Title'}</p>
+                                <p className='text-xs text-gray-500'>{description || 'Description'}</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div className='mt-5 flex justify-end'>
