@@ -14,7 +14,9 @@ import AdminSingnIn from '@/pages/admin/signin';
 import AdminAddProduct from '@/pages/admin/add-product';
 import CategoryForm from '@/pages/admin/category';
 import Categories from '@/pages/admin/categories';
+import Products from '@/pages/admin/products';
 import { CategoriesProvider } from '@/contexts/category';
+import { ProductsProvider } from '@/contexts/product';
 // router
 export const router = createBrowserRouter([
     {
@@ -44,6 +46,10 @@ export const router = createBrowserRouter([
             {
                 path: "/admin/products/add",
                 element: <AdminAddProduct />
+            },
+            {
+                path: "/admin/products",
+                element: <ProductsProvider><Products /></ProductsProvider>
             },
         ]
     },

@@ -1,17 +1,19 @@
 import Product from '../models/product.model.js';
 import Variant from '../models/variant.model.js';
 import Combination from '../models/combination.model.js';
+import Category from "../models/category.model.js";
 // Create a new product
 export const createProduct = async (req, res) => {
   try {
     const { 
-        // categoryId, 
-        // title, 
-        // comparePrice, 
-        // price, 
-        // slug,  
+        categoryId, 
+        title, 
         description, 
         isVariant, 
+        comparePrice,
+        price,
+        differentPrice,
+        visible,
     } = req.body;
       const  variants =  JSON.parse(req.body.variants);
       const  combinations =  JSON.parse(req.body.combinations);
@@ -19,22 +21,37 @@ export const createProduct = async (req, res) => {
     const imageFiles = req.files;
 
     let images = [];
-    imageFiles.forEach((combination, index) => {
+    imageFiles.forEach((combination, index) => { 
         const imageFile = imageFiles[index];
         images.push(imageFile.path);
     });
-    let newProduct = new Product({
-        // categoryId,
-        // title,
-        // comparePrice,
-        // price,
-        // slug,
-        images,
-        description,
-        isVariant
-    });
+    let url = title.trim().toLowerCase().replace(/\s+/g, '-');
 
-    if (isVariant) {
+    // Step 2: Check if the slug already exists in the database
+    let slugExists = await Product.findOne({ slug: url });  
+    let tmp = url;
+    // Step 3: If the slug exists, append 4 random numbers
+    while (slugExists) {
+      const randomNumbers = Math.floor(1000 + Math.random() * 9000);
+      tmp = `${url}-${randomNumbers}`;
+  
+      slugExists = await Product.findOne({ slug: tmp });
+    }
+    let category = await Category.findById(categoryId); 
+    let newProduct = new Product({
+        categoryId: category,
+        title,
+        comparePrice,
+        price,
+        differentPrice,
+        url: tmp,
+        images,
+        visible,
+        description,
+        isVariant,
+    });
+    
+    if (isVariant){
         console.log('good')
         newProduct = await newProduct.save();
         // Save each variant 
@@ -85,7 +102,7 @@ export const createProduct = async (req, res) => {
 // Get all products
 export const getProducts = async (req, res) => {
   try {
-    const products = await Product.find();
+    const products = await Product.find().populate('categoryId');
     res.status(200).json(products);
   } catch (error) {
     console.error("Error fetching products:", error);

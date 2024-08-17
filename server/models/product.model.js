@@ -34,8 +34,12 @@ const productSchema = mongoose.Schema(
         isVariant: {
             type: Boolean,
         },
-        variants: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Variant' }], // Array of variant references
-        combinations: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Combination' }]
+        visible: {
+            type: Boolean,
+        },
+        differentPrice: {
+            type: Boolean,
+        },
     },
     {
         timestamps: true,
