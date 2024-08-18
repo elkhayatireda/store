@@ -1,4 +1,3 @@
-import io from 'socket.io-client';
 import { authContext } from "@/contexts/AuthWrapper";
 import { useContext, useEffect, useState } from "react";
 import 
@@ -23,7 +22,6 @@ import
   import { 
     LogOut 
   } from 'lucide-react';
-  const socket = io('http://localhost:5555');
   import { toast } from 'react-toastify';
   import 'react-toastify/dist/ReactToastify.css';
   import { axiosClient } from '../../api/axios'; 

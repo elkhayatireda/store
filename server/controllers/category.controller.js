@@ -62,6 +62,17 @@ export const getCategories = async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
+export const getAllCategories = async (req, res) => {
+  try {
+    // Query categories and select only _id and title fields
+    const categories = await Category.find({}, 'title'); // Only fetch title, _id is included by default
+
+    res.status(200).json(categories);
+  } catch (error) {
+    console.error("Error fetching categories:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
 
 // Get a single category by ID
 export const getCategory = async (req, res) => {
