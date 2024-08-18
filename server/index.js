@@ -7,7 +7,7 @@ import adminRoutes from "./routes/admin.route.js";
 import productRoutes from "./routes/product.route.js";
 import categoryRoutes from "./routes/category.route.js";
 import http from 'http';
-import { initSocket } from './services/socket.js';
+
 
 const app = express(); 
 app.use(
@@ -18,8 +18,7 @@ app.use(
     credentials: true,
   })
 );
-const server = http.Server(app);
-const io = initSocket(server);
+
 app.use(express.json());
 
 mongoose.connect(process.env.MONGODB_URL)
@@ -30,7 +29,7 @@ mongoose.connect(process.env.MONGODB_URL)
     console.error(`something went wrong while connecting to database: ${error}`);
   });
 
-server.listen(process.env.PORT, (error) => {
+app.listen(process.env.PORT, (error) => {
   if (error) {
     console.error(`Error starting server: ${error}`);
   } else {

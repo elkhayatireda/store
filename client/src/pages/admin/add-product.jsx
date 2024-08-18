@@ -5,7 +5,9 @@ import { authContext } from "../../contexts/AuthWrapper";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import { ImageUp, X, Image, Trash } from "lucide-react";
-import { Link } from 'react-router-dom';
+import { Link } from "react-router-dom";
+import imageCompression from 'browser-image-compression'; // Import the library
+
 
 export default function AddProduct() {
   const userContext = useContext(authContext);
@@ -27,6 +29,7 @@ export default function AddProduct() {
   const [isPopupVisible, setPopupVisible] = useState(false);
   const [categories, setCategories] = useState([]);
   const [currentCombinationIndex, setCurrentCombinationIndex] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const fetchCategories = async () => {
     try {
@@ -116,10 +119,32 @@ export default function AddProduct() {
     });
     generateCombinations();
   };
-
+  async function compressImages(imageFiles) {
+    const compressedImages = await Promise.all(
+      imageFiles.map(async (file) => {
+        const options = {
+          maxSizeMB: 1, // Set the maximum size for the compressed image
+          maxWidthOrHeight: 1920, // Set the maximum width or height
+          useWebWorker: true, // Use web worker for better performance
+        };
+        try {
+          const compressedFile = await imageCompression(file, options);
+          return compressedFile;
+        } catch (error) {
+          console.error('Error during image compression:', error);
+          return file; // Return the original file if compression fails
+        }
+      })
+    );
+  
+    return compressedImages;
+  }
   const handleUpdate = async () => {
+    setIsLoading(true);
     const formDataToSend = new FormData();
+    const compressedImages = await compressImages(formData.images);
 
+    // let images = compressedImages.map((image) => image.path);
     // Append the text data
     formDataToSend.append("title", formData.productTitle);
     formDataToSend.append("description", value);
@@ -136,7 +161,7 @@ export default function AddProduct() {
     );
 
     // Append images
-    formData.images.forEach((image, index) => {
+    compressedImages.forEach((image, index) => {
       formDataToSend.append("images", image);
     });
 
@@ -148,6 +173,7 @@ export default function AddProduct() {
       });
       console.log(response.data);
       toast.success("Product created successfully");
+      setIsLoading(false);
     } catch (error) {
       console.error(error);
       toast.error("Something went wrong");
@@ -221,9 +247,9 @@ export default function AddProduct() {
       images: newImages,
     });
   };
-  useEffect(()=>{
-     console.log(value)
-  },[value]);
+  useEffect(() => {
+    console.log(value);
+  }, [value]);
   return (
     <div className="flex flex-col pt-5   pr-5 px-10 relative ">
       <div className="w-full fixed bottom-0 border-[1px] bg-white border-gray-200 right-0 left-0  flex items-center justify-end py-3 ">
@@ -234,6 +260,11 @@ export default function AddProduct() {
           save
         </button>
       </div>
+      {isLoading && (
+        <div className="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50 top-0 bottom-0 right-0 left-0">
+            loading...
+        </div>
+      )}
       <div className="w-full flex items-center justify-between mb-10">
         <h4 className="text-4xl font-semibold text-[#141414]">New Product</h4>
       </div>
@@ -259,15 +290,15 @@ export default function AddProduct() {
                 htmlFor="images"
                 className="w-full border-2 border-gray-200 rounded-xl p-5 py-10 flex flex-col items-center justify-center cursor-pointer"
               >
-              <div className="mb-3 text-black">
-                <ImageUp size={40} />
-              </div>
-              <p className="text-black text-lg ">
-                Drag & Drop product images or Browse files
-              </p>
-              <p className="text-gray-400 text-sm">
-                Supports png, jpg, jpeg, webp formats
-              </p>
+                <div className="mb-3 text-black">
+                  <ImageUp size={40} />
+                </div>
+                <p className="text-black text-lg ">
+                  Drag & Drop product images or Browse files
+                </p>
+                <p className="text-gray-400 text-sm">
+                  Supports png, jpg, jpeg, webp formats
+                </p>
               </label>
               <input
                 type="file"
@@ -300,7 +331,7 @@ export default function AddProduct() {
             <div className="flex items-center justify-start gap-2">
               <div className="flex items-center justify-start gap-4 w-full">
                 <label
-                  class="inline-flex items-center cursor-pointer outline-none"
+                  className="inline-flex items-center cursor-pointer outline-none"
                   htmlFor="isVariant"
                 >
                   <input
@@ -311,15 +342,15 @@ export default function AddProduct() {
                     checked={formData.isVariant}
                     onChange={handleChange}
                   />
-                  <div class="relative w-11 h-6 bg-gray-200 rounded-full peer  peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-green-500"></div>
-                  <span class="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">
+                  <div className="relative w-11 h-6 bg-gray-200 rounded-full peer  peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-green-500"></div>
+                  <span className="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">
                     the product has variants?
                   </span>
                 </label>
                 {formData.isVariant && (
                   <>
                     <label
-                      class="inline-flex items-center cursor-pointer outline-none"
+                      className="inline-flex items-center cursor-pointer outline-none"
                       htmlFor="differentPrice"
                     >
                       <input
@@ -330,8 +361,8 @@ export default function AddProduct() {
                         checked={formData.differentPrice}
                         onChange={handleChange}
                       />
-                      <div class="relative w-11 h-6 bg-gray-200 rounded-full peer  peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-green-500"></div>
-                      <span class="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">
+                      <div className="relative w-11 h-6 bg-gray-200 rounded-full peer  peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-green-500"></div>
+                      <span className="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">
                         prices depends on variants?
                       </span>
                     </label>
@@ -432,12 +463,12 @@ export default function AddProduct() {
                         </div>
                         {isPopupVisible && (
                           <div className="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50">
-                            <div className="bg-white p-4 rounded-lg" >
+                            <div className="bg-white p-4 rounded-lg">
                               <button
                                 className="absolute top-2 right-2 text-gray-500"
                                 onClick={() => setPopupVisible(false)}
                               >
-                                <X color="white" size={35}/>
+                                <X color="white" size={35} />
                               </button>
                               <div className="grid grid-cols-3 gap-2 p-5">
                                 {formData.images.map((file, index) => (
@@ -454,16 +485,16 @@ export default function AddProduct() {
                                     />
                                   </div>
                                 ))}
-                                {
-                                  typeof formData.combinations[currentCombinationIndex].img === 'number' && 
+                                {typeof formData.combinations[
+                                  currentCombinationIndex
+                                ].img === "number" && (
                                   <div
                                     className="min-w-28 min-h-28 rounded  flex items-center justify-center cursor-pointer bg-red-100"
                                     onClick={() => handleImageSelect(null)}
                                   >
-                                    <Trash color='red' />
+                                    <Trash color="red" />
                                   </div>
-                                }
-                                
+                                )}
                               </div>
                             </div>
                           </div>
@@ -519,21 +550,25 @@ export default function AddProduct() {
               </label>
             </div>
             <select
-                id="productCategory"
-                className="py-2 pl-5 w-full outline-none border-2 border-gray-200 rounded-xl mb-3"
-                value={formData.productCategory}
-                onChange={handleChange}
-              >
-                <option value="">Select a category</option>
-                {categories.map((elem) => (
-                  <option key={elem.title} value={elem._id}>
-                    {elem.title}
-                  </option>
-                ))}
-              </select>
-              <Link to="/admin/categories/create" target="_blank" className="text-sm font-medium text-blue-700 pl-2">
+              id="productCategory"
+              className="py-2 pl-5 w-full outline-none border-2 border-gray-200 rounded-xl mb-3"
+              value={formData.productCategory}
+              onChange={handleChange}
+            >
+              <option value="">Select a category</option>
+              {categories.map((elem) => (
+                <option key={elem.title} value={elem._id}>
+                  {elem.title}
+                </option>
+              ))}
+            </select>
+            <Link
+              to="/admin/categories/create"
+              target="_blank"
+              className="text-sm font-medium text-blue-700 pl-2"
+            >
               Or create a new category
-              </Link>
+            </Link>
           </div>
         </div>
       </div>
