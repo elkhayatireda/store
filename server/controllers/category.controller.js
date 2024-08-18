@@ -50,7 +50,8 @@ export const getCategories = async (req, res) => {
           title: 1,
           description: 1,
           imgPath: 1,
-          productCount: 1
+          productCount: 1,
+          createdAt: 1 // Include the creation date
         }
       }
     ]);
@@ -61,7 +62,6 @@ export const getCategories = async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
-
 
 // Get a single category by ID
 export const getCategory = async (req, res) => {
