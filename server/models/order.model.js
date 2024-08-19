@@ -37,7 +37,7 @@ const orderSchema = mongoose.Schema(
                     type: Number,
                     required: true,
                 },
-                unitePrice: {
+                unitPrice: {
                     type: Number,
                     required: true,
                 }

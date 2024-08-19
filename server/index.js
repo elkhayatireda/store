@@ -6,10 +6,11 @@ import cors from "cors";
 import adminRoutes from "./routes/admin.route.js";
 import productRoutes from "./routes/product.route.js";
 import categoryRoutes from "./routes/category.route.js";
+import orderRoutes from "./routes/order.route.js";
 import http from 'http';
 
 
-const app = express(); 
+const app = express();
 app.use(
   cors({
     origin: "http://localhost:5173",
@@ -40,6 +41,7 @@ app.listen(process.env.PORT, (error) => {
 app.use('/api/admin', adminRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/products', productRoutes);
+app.use('/api/orders', orderRoutes);
 
 // server.js (or your main server file)
 app.use((err, req, res, next) => {

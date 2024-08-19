@@ -9,6 +9,7 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from '@/components/ui/input';
+import { toast } from 'react-toastify';
 
 const AddOrder = () => {
     const [products, setProducts] = useState([]);
@@ -34,16 +35,32 @@ const AddOrder = () => {
     }, []);
 
     const handleAddToOrder = (product, quantity) => {
-        const item = {
-            id: product._id,
-            title: product.title,
-            image: selectedCombination && selectedCombination.image ? selectedCombination.image : product.images[0],
-            unitPrice: selectedCombination ? selectedCombination.price : product.price,
-            variant: selectedCombination ? selectedCombination.combination : null,
-            quantity: Number(quantity),
-        };
+        setOrderItems(prevOrderItems => {
+            const existingItemIndex = prevOrderItems.findIndex(
+                item =>
+                    item.id === product._id &&
+                    item.variant === (selectedCombination ? selectedCombination.combination : null)
+            );
 
-        setOrderItems(prev => [...prev, item]);
+            if (existingItemIndex !== -1) {
+                // If the item exists, update its quantity
+                const updatedOrderItems = [...prevOrderItems];
+                updatedOrderItems[existingItemIndex].quantity += Number(quantity);
+                return updatedOrderItems;
+            } else {
+                // If the item doesn't exist, add it to the order
+                const newItem = {
+                    id: product._id,
+                    title: product.title,
+                    image: selectedCombination && selectedCombination.image ? selectedCombination.image : product.images[0],
+                    unitPrice: selectedCombination ? selectedCombination.price : product.price,
+                    variant: selectedCombination ? selectedCombination.combination : null,
+                    quantity: Number(quantity),
+                };
+                return [...prevOrderItems, newItem];
+            }
+        });
+
         setSelectedCombination(null); // Reset the selected combination
     };
 
@@ -59,15 +76,23 @@ const AddOrder = () => {
         return orderItems.reduce((total, item) => total + item.unitPrice * item.quantity, 0);
     };
 
-    const handleSaveOrder = () => {
+    const handleSaveOrder = async () => {
         const order = {
             guestInfo,
             items: orderItems,
             totalPrice: calculateTotalPrice(),
+            status: 'pending'
         };
 
-        console.log(order);
-        // You can send the order to the server here if needed
+        try {
+            const response = await axiosClient.post('/orders', order);
+            toast.success('Order created successfully');
+            console.log('Order created successfully:', response.data);
+            setOrderItems([]);
+        } catch (error) {
+            toast.error('Error creating order');
+            console.error('Error creating order:', error);
+        }
     };
 
     return (
@@ -157,6 +182,7 @@ const AddOrder = () => {
                                 <Button onClick={() => {
                                     const quantity = document.getElementById(`quantity-${product._id}`).value;
                                     handleAddToOrder(product, quantity);
+                                    toast.success("product added to order")
                                 }}>Add to order</Button>
                             </DialogContent>
                         </Dialog>
