@@ -17,6 +17,7 @@ import Categories from '@/pages/admin/categories';
 import Products from '@/pages/admin/products';
 import { CategoriesProvider } from '@/contexts/category';
 import { ProductsProvider } from '@/contexts/product';
+import AddOrder from '@/pages/admin/add-order';
 // router
 export const router = createBrowserRouter([
     {
@@ -50,6 +51,10 @@ export const router = createBrowserRouter([
             {
                 path: "/admin/products",
                 element: <ProductsProvider><Products /></ProductsProvider>
+            },
+            {
+                path: "/admin/orders/add",
+                element: <ProductsProvider><AddOrder /></ProductsProvider>
             },
         ]
     },
