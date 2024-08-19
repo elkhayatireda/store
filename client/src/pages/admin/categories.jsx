@@ -21,7 +21,7 @@ function Categories() {
                     Create <Plus size={18} />
                 </Link>
             </div>
-                <CategoriesTable columns={categoryColumns} data={data} />
+            <CategoriesTable columns={categoryColumns} data={data} />
         </div >
     );
 }
