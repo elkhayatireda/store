@@ -57,9 +57,7 @@ export function CategoriesTable({ columns, data }) {
                                 if (window.confirm('Are you sure you want to delete the selected categories?')) {
                                     try {
                                         await deleteMultipleCategories(selectedRowIds)
-                                        toast.success('Selected categories deleted successfully');
                                     } catch (error) {
-                                        toast.error('Failed to delete selected categories');
                                         console.error('Delete error:', error);
                                     }
                                 }

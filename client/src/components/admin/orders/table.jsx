@@ -20,7 +20,7 @@ import { useState } from "react";
 import CustomInput from "@/components/custom/CustomInput";
 import { toast } from "react-toastify";
 
-export function CategoriesTable({ columns, data }) {
+export function OrdersTable({ columns, data }) {
     // const { deleteMultipleOrders } = useOrders()
 
     const [sorting, setSorting] = useState([]);

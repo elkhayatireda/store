@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import Order from '../models/order.model.js';
 
 // Create a new order
@@ -22,15 +23,21 @@ export const createOrder = async (req, res) => {
 // Delete an order by ID
 export const deleteOrder = async (req, res) => {
     try {
-        const order = await Order.findById(req.params.id);
+        const id = req.params.id;
 
-        if (order) {
-            await order.remove();
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ message: 'Invalid order ID' });
+        }
+
+        const result = await Order.deleteOne({ _id: id });
+
+        if (result.deletedCount > 0) {
             res.json({ message: 'Order removed' });
         } else {
             res.status(404).json({ message: 'Order not found' });
         }
     } catch (error) {
+        console.error('Error deleting order:', error);
         res.status(500).json({ message: error.message });
     }
 };

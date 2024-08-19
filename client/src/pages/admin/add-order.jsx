@@ -39,7 +39,7 @@ const AddOrder = () => {
             const existingItemIndex = prevOrderItems.findIndex(
                 item =>
                     item.id === product._id &&
-                    item.variant === (selectedCombination ? selectedCombination.combination : null)
+                    item.variant === (selectedCombination ? selectedCombination.combination : '-')
             );
 
             if (existingItemIndex !== -1) {
@@ -54,7 +54,7 @@ const AddOrder = () => {
                     title: product.title,
                     image: selectedCombination && selectedCombination.image ? selectedCombination.image : product.images[0],
                     unitPrice: selectedCombination ? selectedCombination.price : product.price,
-                    variant: selectedCombination ? selectedCombination.combination : null,
+                    variant: selectedCombination ? selectedCombination.combination : '-',
                     quantity: Number(quantity),
                 };
                 return [...prevOrderItems, newItem];
@@ -152,7 +152,7 @@ const AddOrder = () => {
                                     <DialogTitle>{product.title}</DialogTitle>
                                 </DialogHeader>
                                 <div className='max-h-72 overflow-auto'>
-                                    {product.isVariant && product.combinations.length > 0 ? (
+                                    {product.isVariant && product.combinations.length > 0 && (
                                         <div>
                                             {product.combinations.map(combination => (
                                                 <label key={combination._id} className="flex items-center space-x-2">
@@ -171,8 +171,6 @@ const AddOrder = () => {
                                                 </label>
                                             ))}
                                         </div>
-                                    ) : (
-                                        <p>No combinations available</p>
                                     )}
                                 </div>
                                 <div>
