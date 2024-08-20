@@ -19,9 +19,10 @@ import {
 import { useState } from "react";
 import CustomInput from "@/components/custom/CustomInput";
 import { toast } from "react-toastify";
+import { useOrders } from "@/contexts/order";
 
 export function OrdersTable({ columns, data }) {
-    // const { deleteMultipleOrders } = useOrders()
+    const { deleteMultipleOrders } = useOrders()
 
     const [sorting, setSorting] = useState([]);
     const [columnFilters, setColumnFilters] = useState([])
@@ -47,7 +48,7 @@ export function OrdersTable({ columns, data }) {
     return (
         <div>
             <div className={`my-2 flex flex-col sm:flex-row items-start sm:items-center ${table.getFilteredSelectedRowModel().rows.length > 0 ? 'justify-between' : 'justify-end'}`}>
-                {/* {
+                {
                     table.getFilteredSelectedRowModel().rows.length > 0 &&
                     <Button
                         onClick={async () => {
@@ -70,15 +71,7 @@ export function OrdersTable({ columns, data }) {
                     >
                         Delete selected
                     </Button>
-                } */}
-                {/* line 55 | table.getFilteredSelectedRowModel().rows.map(row => row.original._id) */}
-                {/* <CustomInput
-                    placeholder="Find order..."
-                    value={(table.getColumn("")?.getFilterValue()) ?? ""}
-                    onChange={(event) =>
-                        table.getColumn("")?.setFilterValue(event.target.value)
-                    }
-                /> */}
+                }
             </div>
             <div className="rounded-md border">
                 <Table>

@@ -127,17 +127,16 @@ const CategoryForm = () => {
 
     return (
         <div>
-            <div className='flex items-center justify-between'>
-                <h2 className='text-xl font-semibold'>
-                    {id !== 'create' ? `Edit ${title} Category` : 'Create a new category'}
-                </h2>
-                <Link
-                    className='flex items-center gap-0.5 text-blue-500'
-                    to={'/admin/categories'}
-                >
-                    <ChevronLeft size={18} /> Back
-                </Link>
-            </div>
+            <Link
+                className='flex items-center gap-0.5 text-blue-500'
+                to={'/admin/categories'}
+            >
+                <ChevronLeft size={18} /> Back
+            </Link>
+            <h2 className='text-xl font-semibold'>
+                {id !== 'create' ? `Edit ${title} Category` : 'Create a new category'}
+            </h2>
+
             <form className='mt-7' onSubmit={handleSubmit}>
                 <div className='w-full flex flex-col sm:flex-row justify-center items-center gap-8'>
                     <div>

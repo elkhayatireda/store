@@ -34,12 +34,12 @@ export const OrdersProvider = ({ children }) => {
     };
 
     const deleteMultipleOrders = async (ids) => {
-        // try {
-        //     await axiosClient.post('/categories/delete-multiple', { ids: categoryIds });
-        //     setData(prevData => prevData.filter(category => !categoryIds.includes(category._id)));
-        // } catch (error) {
-        //     console.error('Error deleting multiple categories:', error);
-        // }
+        try {
+            await axiosClient.post('/orders/delete-multiple', { ids });
+            setData(prevData => prevData.filter(order => !ids.includes(order._id)));
+        } catch (error) {
+            console.error('Error deleting multiple categories:', error);
+        }
     };
 
     return (

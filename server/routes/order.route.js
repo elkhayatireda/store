@@ -2,6 +2,7 @@ import express from "express";
 import { verifyTokenAdmin } from "../controllers/verifytokenadmin.controller.js";
 import {
   createOrder,
+  deleteOrders,
   getAllOrders,
   getOrderById,
   deleteOrder,
@@ -13,6 +14,7 @@ import {
 const router = express.Router();
 
 router.post('/', verifyTokenAdmin, createOrder);
+router.post('/delete-multiple', verifyTokenAdmin, deleteOrders);
 router.get('/', verifyTokenAdmin, getAllOrders);
 router.get('/:id', verifyTokenAdmin, getOrderById);
 router.put('/status/:id', verifyTokenAdmin, updateOrderStatus);

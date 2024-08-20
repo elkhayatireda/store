@@ -13,7 +13,7 @@ function AdminLayout() {
     const [expanded, setExpanded] = useState(false);
 
     // Sidebar width, adjust according to your sidebar's width
-    const sidebarWidth = expanded ? '190px' : '65px';
+    const sidebarWidth = expanded ? '200px' : '75px';
 
     return (
         <>
@@ -30,7 +30,7 @@ function AdminLayout() {
             </SideBar>
             <main
                 className="transition-all duration-300 pb-4 pr-3"
-                style={{ marginLeft: sidebarWidth, marginTop: '4.5rem' }} // Adjusts the margin-left based on sidebar's state
+                style={{ marginLeft: sidebarWidth, marginTop: '5rem' }} // Adjusts the margin-left based on sidebar's state
             >
                 <Outlet />
             </main>

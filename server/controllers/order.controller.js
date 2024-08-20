@@ -104,3 +104,19 @@ export const updateOrderDetails = async (req, res) => {
         res.status(400).json({ message: error.message });
     }
 };
+
+export const deleteOrders = async (req, res) => {
+    try {
+        const ids = req.body.ids;
+        if (!ids || !Array.isArray(ids)) {
+            return res.status(400).json({ message: "Invalid request body" });
+        }
+
+        await Order.deleteMany({ _id: { $in: ids } });
+
+        res.status(200).json({ message: "orders deleted successfully" });
+    } catch (error) {
+        console.error("Error deleting orders:", error);
+        res.status(500).json({ message: "Internal server error" });
+    }
+};
