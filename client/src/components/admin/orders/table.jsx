@@ -73,6 +73,15 @@ export function OrdersTable({ columns, data }) {
                     </Button>
                 }
             </div>
+            <div className="flex items-center py-4">
+                <CustomInput
+                    placeholder="Filter customer..."
+                    value={(table.getColumn("customer")?.getFilterValue()) ?? ""}
+                    onChange={(event) =>
+                        table.getColumn("customer")?.setFilterValue(event.target.value)
+                    }
+                />
+            </div>
             <div className="rounded-md border">
                 <Table>
                     <TableHeader>

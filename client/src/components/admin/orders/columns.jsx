@@ -47,7 +47,8 @@ const orderColumns = [
         enableHiding: false,
     },
     {
-        id: "customer",
+        id: 'customer',
+        accessorKey: "guestInfo.fullName",
         header: ({ column }) => {
             return (
                 <Button
@@ -59,11 +60,6 @@ const orderColumns = [
                     <ArrowUpDown className="ml-2 h-4 w-4" />
                 </Button>
             )
-        },
-        cell: ({ row }) => {
-            return <span>
-                {row.original.guestInfo.fullName}
-            </span>
         },
     },
     {
