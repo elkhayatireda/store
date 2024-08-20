@@ -19,6 +19,9 @@ import { Link } from "react-router-dom"
 import { toast } from "react-toastify"
 import { Checkbox } from "@/components/ui/checkbox"
 import { useOrders } from "@/contexts/order"
+import { DialogDescription } from "@radix-ui/react-dialog"
+import { useState } from "react"
+import { axiosClient } from "@/api/axios"
 
 const orderColumns = [
     {
@@ -85,9 +88,30 @@ const orderColumns = [
     {
         header: "Status",
         cell: ({ row }) => {
-            return <span>
-                {row.original.status}
-            </span>
+            const status = row.original.status;
+
+            const getStatusStyles = (status) => {
+                switch (status) {
+                    case 'pending':
+                        return 'bg-yellow-50 text-yellow-600';
+                    case 'confirmed':
+                        return 'bg-blue-50 text-blue-600';
+                    case 'shipped':
+                        return 'bg-purple-50 text-purple-600';
+                    case 'delivered':
+                        return 'bg-green-50 text-green-600';
+                    case 'canceled':
+                        return 'bg-red-50 text-red-600';
+                    default:
+                        return 'bg-gray-50 text-gray-600';
+                }
+            };
+
+            return (
+                <span className={`px-1.5 py-0.5 rounded-md text-sm font-medium ${getStatusStyles(status)}`}>
+                    {status}
+                </span>
+            );
         },
     },
     {
@@ -119,9 +143,38 @@ const orderColumns = [
         header: "Actions",
         cell: ({ row }) => {
             const order = row.original
-            const { deleteOrder } = useOrders()
+            const statusOptions = ['pending', 'confirmed', 'shipped', 'delivered', 'canceled'];
+            const [status, setStatus] = useState(row.original.status);
+            const [isDetailsOpen, setIsDetailsOpen] = useState(false)
+            const [isStatusOpen, setIsStatusOpen] = useState(false)
+            const { deleteOrder, setData } = useOrders()
+
+            const handleStatusChange = (e) => {
+                const newStatus = e.target.value;
+                setStatus(newStatus);
+            };
+            const handleStatusSave = async (e) => {
+                try {
+                    await axiosClient.put(`/orders/status/${row.original._id}`, { status });
+                    console.log("Status updated successfully");
+                    toast.success("Status updated successfully");
+
+                    // Update the orders state
+                    setData((prevOrders) =>
+                        prevOrders.map((order) =>
+                            order._id === row.original._id
+                                ? { ...order, status }
+                                : order
+                        )
+                    );
+                    isStatusOpen ? setIsStatusOpen(false) : setIsDetailsOpen(false)
+                } catch (error) {
+                    console.error("Failed to update status", error);
+                    toast.error("Failed to update status");
+                }
+            };
             return (
-                <Dialog>
+                <>
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <Button variant="ghost" className="h-8 w-8 p-0">
@@ -131,9 +184,8 @@ const orderColumns = [
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                            <DropdownMenuItem>
-                                <DialogTrigger>View details</DialogTrigger>
-                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => setIsDetailsOpen(true)}>View details</DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => setIsStatusOpen(true)}>Edit status</DropdownMenuItem>
                             {/* <DropdownMenuItem className='text-blue-600'>
                             <Link to={'/admin/categories/' + order._id}>Update</Link>
                         </DropdownMenuItem> */}
@@ -153,27 +205,58 @@ const orderColumns = [
                             </DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
-
-                    <DialogContent>
-                        <DialogHeader>
-                            <DialogTitle>Order items</DialogTitle>
-                        </DialogHeader>
-                        <div className="h-72 overflow-auto">
-                            {order.items.map(item => (
-                                <div className="border px-4 py-2 rounded-sm mb-2">
-                                    <div className="flex gap-2 items-start">
-                                        <img className="w-9 h-9 rounded-full" src={item.image} alt={item.title} />
-                                        <p className="text-sm">{item.title} - {item.variant}</p>
+                    <Dialog open={isDetailsOpen}
+                        onOpenChange={isDetailsOpen ?
+                            setIsDetailsOpen : setIsStatusOpen}>
+                        <DialogContent>
+                            <DialogHeader>
+                                <DialogTitle>Order info</DialogTitle>
+                            </DialogHeader>
+                            <div className="text-sm text-gray-600 font-light">
+                                <p><span className="text-gray-700 font-medium">Customer:</span> {order.guestInfo.fullName}</p>
+                                <p><span className="text-gray-700 font-medium">Phone number:</span> {order.guestInfo.phone}</p>
+                                <p><span className="text-gray-700 font-medium">Address:</span> {order.guestInfo.address}</p>
+                            </div>
+                            <div className="h-72 overflow-auto">
+                                {order.items.map(item => (
+                                    <div className="border px-4 py-1 rounded-sm mb-2">
+                                        <div className="flex gap-2 items-start">
+                                            <img className="w-9 h-9 rounded-full" src={item.image} alt={item.title} />
+                                            <div>
+                                                <p className="text-sm">{item.title} - {item.variant}</p>
+                                                <p className="text-xs text-gray-400">{item.quantity} * {item.unitPrice}DH</p>
+                                            </div>
+                                        </div>
+                                        <div className="flex justify-between items-start">
+                                            <p className="test-sm text-gray-500">Total:</p>
+                                            <p className="text-sm text-gray-500">{item.quantity * item.unitPrice}DH</p>
+                                        </div>
                                     </div>
-                                    <div className="flex justify-between items-start">
-                                        <p className="text-xs text-gray-400">{item.quantity} * {item.unitPrice}DH</p>
-                                        <p className="text-sm text-gray-500">{item.quantity * item.unitPrice}DH</p>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </DialogContent>
-                </Dialog>
+                                ))}
+                            </div>
+                        </DialogContent>
+                    </Dialog>
+                    <Dialog open={isStatusOpen}
+                        onOpenChange={isStatusOpen ?
+                            setIsStatusOpen : setIsDetailsOpen}>
+                        <DialogContent>
+                            <DialogHeader>
+                                <DialogTitle>Edit status</DialogTitle>
+                            </DialogHeader>
+                            <select
+                                value={status}
+                                onChange={handleStatusChange}
+                            >
+                                {statusOptions.map(option => (
+                                    <option key={option} value={option}>
+                                        {option.charAt(0).toUpperCase() + option.slice(1)}
+                                    </option>
+                                ))}
+                            </select>
+                            <Button onClick={handleStatusSave}>Save</Button>
+                        </DialogContent>
+                    </Dialog>
+                </>
             )
         },
     },
