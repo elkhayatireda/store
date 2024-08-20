@@ -1,13 +1,22 @@
 import mongoose from 'mongoose';
 import Order from '../models/order.model.js';
+import Customer from '../models/customer.model.js';
 
 // Create a new order
 export const createOrder = async (req, res) => {
     try {
         const { guestInfo, items, totalPrice, status } = req.body;
 
+        // Check if customer exists
+        let customer = await Customer.findOne({ phone: guestInfo.phone });
+        if (!customer) {
+            // Create a new customer if not found
+            customer = new Customer(guestInfo);
+            await customer.save();
+        }
+
         const order = new Order({
-            guestInfo,
+            customerId: customer._id,
             items,
             totalPrice,
             status
@@ -63,8 +72,21 @@ export const updateOrderStatus = async (req, res) => {
 // Get all orders
 export const getAllOrders = async (req, res) => {
     try {
-        const orders = await Order.find({});
-        res.json(orders);
+        // Fetch orders and populate customer information
+        const orders = await Order.find({}).populate('customerId');
+
+        // Transform each order to include guestInfo as expected by the frontend
+        const ordersWithGuestInfo = orders.map(order => ({
+            ...order.toObject(), // Convert the Mongoose document to a plain JavaScript object
+            guestInfo: {
+                fullName: order.customerId.fullName,
+                phone: order.customerId.phone,
+                address: order.customerId.address,
+                email: order.customerId.email,
+            }
+        }));
+
+        res.json(ordersWithGuestInfo);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -73,10 +95,22 @@ export const getAllOrders = async (req, res) => {
 // Get a single order by ID
 export const getOrderById = async (req, res) => {
     try {
-        const order = await Order.findById(req.params.id);
+        // Find the order by ID and populate the customer information
+        const order = await Order.findById(req.params.id).populate('customerId');
 
         if (order) {
-            res.json(order);
+            // Transform the order to include guestInfo as expected by the frontend
+            const orderWithGuestInfo = {
+                ...order.toObject(), // Convert the Mongoose document to a plain JavaScript object
+                guestInfo: {
+                    fullName: order.customerId.fullName,
+                    phone: order.customerId.phone,
+                    address: order.customerId.address,
+                    email: order.customerId.email,
+                }
+            };
+
+            res.json(orderWithGuestInfo);
         } else {
             res.status(404).json({ message: 'Order not found' });
         }

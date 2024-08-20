@@ -1,20 +1,11 @@
 import mongoose from "mongoose";
 
-const orderSchema = mongoose.Schema(
+const orderSchema = new mongoose.Schema(
     {
-        guestInfo: {
-            fullName: {
-                type: String,
-                required: true,
-            },
-            phone: {
-                type: String,
-                required: true,
-            },
-            address: {
-                type: String,
-                required: true,
-            },
+        customerId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Customer',
+            required: true,
         },
         items: [
             {
