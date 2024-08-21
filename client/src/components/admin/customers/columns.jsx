@@ -7,7 +7,6 @@ import {
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuLabel,
-    DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
@@ -18,52 +17,27 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog";
-import { axiosClient } from "@/api/axios";
 import { toast } from "react-toastify";
-import { Checkbox } from "@/components/ui/checkbox";
 import CustomInput from "@/components/custom/CustomInput";
+import { useCustomers } from "@/contexts/customer";
 
 const customerColumns = [
     {
-        id: "select",
-        header: ({ table }) => (
-            <Checkbox
-                checked={
-                    table.getIsAllPageRowsSelected() ||
-                    (table.getIsSomePageRowsSelected() && "indeterminate")
-                }
-                onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-                aria-label="Select all"
-            />
-        ),
-        cell: ({ row }) => (
-            <Checkbox
-                checked={row.getIsSelected()}
-                onCheckedChange={(value) => row.toggleSelected(!!value)}
-                aria-label="Select row"
-            />
-        ),
-        enableSorting: false,
-        enableHiding: false,
-    },
-    {
         accessorKey: "fullName",
-        header: ({ column }) => {
-            return (
-                <Button
-                    className='p-0'
-                    variant="ghost"
-                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-                >
-                    Full Name
-                    <ArrowUpDown className="ml-2 h-4 w-4" />
-                </Button>
-            )
-        }
+        header: ({ column }) => (
+            <Button
+                className='p-0'
+                variant="ghost"
+                onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+            >
+                Full Name
+                <ArrowUpDown className="ml-2 h-4 w-4" />
+            </Button>
+        )
     },
     {
         accessorKey: "address",
-        header: "Adress",
+        header: "Address",
         cell: ({ row }) => {
             const address = row.original.address;
             return (
@@ -79,25 +53,20 @@ const customerColumns = [
     },
     {
         accessorKey: "createdAt",
-        header: ({ column }) => {
-            return (
-                <Button
-                    className='p-0'
-                    variant="ghost"
-                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-                >
-                    Created
-                    <ArrowUpDown className="ml-2 h-4 w-4" />
-                </Button>
-            )
-        },
+        header: ({ column }) => (
+            <Button
+                className='p-0'
+                variant="ghost"
+                onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+            >
+                Created
+                <ArrowUpDown className="ml-2 h-4 w-4" />
+            </Button>
+        ),
         cell: ({ row }) => {
-            const date = new Date(row.original.createdAt)
+            const date = new Date(row.original.createdAt);
             const options = { year: 'numeric', month: 'long', day: 'numeric' };
-            const formattedDate = date.toLocaleDateString('fr-FR', options);
-            return <div>
-                {formattedDate}
-            </div>
+            return <div>{date.toLocaleDateString('fr-FR', options)}</div>;
         }
     },
     {
@@ -105,12 +74,12 @@ const customerColumns = [
         header: "Actions",
         cell: ({ row }) => {
             const customer = row.original;
+            const { updateCustomer, deleteCustomer, validationErrors } = useCustomers();
             const [guestInfo, setGuestInfo] = useState({
                 fullName: customer.fullName || '',
                 phone: customer.phone || '',
                 address: customer.address || '',
             });
-            const [validationErrors, setValidationErrors] = useState({});
             const [saving, setSaving] = useState(false);
 
             const handleInputChange = (e) => {
@@ -121,26 +90,15 @@ const customerColumns = [
             const handleSave = async () => {
                 setSaving(true);
                 try {
-                    // Validate inputs (example)
-                    let errors = {};
-                    if (!guestInfo.fullName) errors.fullName = "Full name is required.";
-                    if (!guestInfo.phone) errors.phone = "Phone number is required.";
-                    if (!guestInfo.address) errors.address = "Address is required.";
-
-                    if (Object.keys(errors).length) {
-                        setValidationErrors(errors);
-                        setSaving(false);
-                        return;
-                    }
-
-                    // Send update request to the server
-                    await axiosClient.put(`/customers/${customer._id}`, guestInfo);
-                    toast.success("Customer updated successfully!");
-                } catch (error) {
-                    console.error("Update error:", error);
-                    toast.error(error.response.data.message);
+                    await updateCustomer(customer._id, guestInfo);
                 } finally {
                     setSaving(false);
+                }
+            };
+
+            const handleDelete = async () => {
+                if (window.confirm("Are you sure you want to delete this customer?")) {
+                    await deleteCustomer(customer._id);
                 }
             };
 
@@ -159,6 +117,9 @@ const customerColumns = [
                                 <DialogTrigger className='text-blue-600'>
                                     Update
                                 </DialogTrigger>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={handleDelete} className='text-red-600'>
+                                Delete
                             </DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
