@@ -53,13 +53,23 @@ export const getCustomerById = async (req, res) => {
 export const updateCustomer = async (req, res) => {
     try {
         const { fullName, phone, address } = req.body;
+
+        // Check if a customer with the same phone number exists (excluding the current customer)
+        const existingCustomer = await Customer.findOne({ phone });
+        if (existingCustomer && existingCustomer._id.toString() !== req.params.id) {
+            return res.status(400).json({ message: "There is another customer with this phone number" });
+        }
+
+        // Find the customer by ID
         const customer = await Customer.findById(req.params.id);
 
         if (customer) {
-            customer.fullName = fullName || customer.fullName;
-            customer.phone = phone || customer.phone;
-            customer.address = address || customer.address;
+            // Update the fields only if new data is provided
+            customer.fullName = fullName ?? customer.fullName;
+            customer.phone = phone ?? customer.phone;
+            customer.address = address ?? customer.address;
 
+            // Save the updated customer
             const updatedCustomer = await customer.save();
             res.status(200).json(updatedCustomer);
         } else {

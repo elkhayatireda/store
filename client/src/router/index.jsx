@@ -20,6 +20,7 @@ import { ProductsProvider } from '@/contexts/product';
 import AddOrder from '@/pages/admin/add-order';
 import { OrdersProvider } from '@/contexts/order';
 import Orders from '@/pages/admin/orders';
+import Customers from '@/pages/admin/customers';
 // router
 export const router = createBrowserRouter([
     {
@@ -61,6 +62,10 @@ export const router = createBrowserRouter([
             {
                 path: "/admin/orders",
                 element: <OrdersProvider><Orders /></OrdersProvider>
+            },
+            {
+                path: "/admin/customers",
+                element: <Customers />
             },
         ]
     },
