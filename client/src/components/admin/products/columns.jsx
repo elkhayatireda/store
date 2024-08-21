@@ -1,19 +1,27 @@
 import { MoreHorizontal } from "lucide-react";
-import { ArrowUpDown } from "lucide-react";
+import { ArrowUpDown, Eye, EyeOff, Pen, Trash } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { Link } from "react-router-dom";
 import { axiosClient } from "@/api/axios";
 import { toast } from "react-toastify";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useProducts } from "@/contexts/product";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogClose,
+} from "@/components/ui/dialog";
 
 const productColumns = [
   {
@@ -82,26 +90,26 @@ const productColumns = [
     },
   },
   {
-    accessorKey: "price",
+    accessorKey: "category",
     header: "category",
     cell: ({ row }) => {
-        return (
-          <div className="flex items-center gap-3">
-            <h4 className="font-medium">{row.original.categoryId.title}</h4>
-          </div>
-        );
-      },
+      return (
+        <div className="flex items-center gap-3">
+          <h4 className="font-medium">{row.original.categoryId.title}</h4>
+        </div>
+      );
+    },
   },
   {
     accessorKey: "price",
     header: "price",
   },
   {
-    accessorKey: "variant",
+    accessorKey: "orders",
     header: "orders",
   },
   {
-    accessorKey: "variant",
+    accessorKey: "visible",
     header: "visibility",
     cell: ({ row }) => {
       return (
@@ -137,11 +145,111 @@ const productColumns = [
     id: "actions",
     header: "Actions",
     cell: ({ row }) => {
-      const category = row.original;
-      const { deleteCategory } = useProducts();
-      return <div className="flex items-center justify-start gap-2">
+      const product = row.original;
+      const { deleteProduct, changeVisibility } = useProducts();
+      return (
+        <div className="flex items-center justify-start gap-3">
+          {/* <div className="rounded-full p-1 border-[2px] border-gray-200"> */}
+          {row.original.visible ? (
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger>
+                  <div 
+                    className="cursor-pointer rounded-full p-2 border-[2px] border-gray-200"
+                    onClick={async () => {
+                      if (window.confirm('Are you sure you want to hide this product?')) {
+                          try {
+                              await changeVisibility(product._id)
+                              toast.success('Product updated successfully');
+                          } catch (error) {
+                              toast.error('Failed to update product');
+                              console.error('Delete error:', error);
+                          }
+                      }
+                    }}
+                  >
+                    <Eye size={20} color="gray" />
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>hide product</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          ) : (
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger>
+                  <div
+                    className="cursor-pointer rounded-full p-2 border-[2px] border-gray-200"
+                    onClick={async () => {
+                    if (window.confirm('Are you sure you want to show this product on your store?')) {
+                        try {
+                            await changeVisibility(product._id)
+                            toast.success('Product updated successfully');
+                        } catch (error) {
+                            toast.error('Failed to update product');
+                            console.error('Delete error:', error);
+                        }
+                    }
+                    }}
+                  >
+                    <EyeOff size={20} color="gray" />
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>show product</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          )}
 
-      </div>;
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger>
+                <Link
+              to={`/admin/products/update/${product._id}`}
+              target="_blank"
+            >
+              <div className="cursor-pointer rounded-full p-2 border-[2px] border-gray-200">
+                <Pen size={20} color="gray" />
+              </div>
+            </Link>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>update product</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <div 
+                      className="cursor-pointer rounded-full p-2 border-[2px] border-red-500"
+                      onClick={async () => {
+                        if (window.confirm('Are you sure you want to delete this product?')) {
+                            try {
+                                await deleteProduct(product._id)
+                                toast.success('Product deleted successfully');
+                            } catch (error) {
+                                toast.error('Failed to delete product');
+                                console.error('Delete error:', error);
+                            }
+                        }
+                      }}
+                    >
+                      <Trash size={20} color="red" />
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>delete product</p>
+                  </TooltipContent>
+                </Tooltip>
+                </TooltipProvider>
+           
+          {/* </div> */}
+        </div>
+      );
     },
   },
 ];

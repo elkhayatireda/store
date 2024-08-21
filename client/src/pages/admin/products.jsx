@@ -15,8 +15,8 @@ function Products() {
                     <p className='text-sm'>Here you can manage the products in your store</p>
                 </div>
                 <Link
-                    className='flex items-center gap-1 px-3 py-1.5 rounded bg-blue-950 text-white'
-                    to={'/admin/products/add'}
+                    className='flex items-center gap-1 px-3 py-1.5 rounded bg-green-500 text-white'
+                    to={'/admin/products/create'}
                 >
                     New Product  <Plus size={18} />
                 </Link>
