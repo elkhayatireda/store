@@ -22,7 +22,7 @@ import { toast } from "react-toastify";
 import { useProducts } from "@/contexts/product";
 
 export function ProductsTable({ columns, data }) {
-    const { deleteMultipleCategories } = useProducts()
+    const { deleteMultipleProducts } = useProducts()
 
     const [sorting, setSorting] = useState([]);
     const [columnFilters, setColumnFilters] = useState([])
@@ -56,7 +56,7 @@ export function ProductsTable({ columns, data }) {
                             if (selectedRowIds.length > 0) {
                                 if (window.confirm('Are you sure you want to delete the selected products?')) {
                                     try {
-                                        await deleteMultipleCategories(selectedRowIds)
+                                        await deleteMultipleProducts(selectedRowIds)
                                         toast.success('Selected products deleted successfully');
                                     } catch (error) {
                                         toast.error('Failed to delete selected products');
@@ -73,7 +73,7 @@ export function ProductsTable({ columns, data }) {
                     </Button>
                 }
                 <CustomInput
-                    placeholder="Find category..."
+                    placeholder="Find product..."
                     value={(table.getColumn("title")?.getFilterValue()) ?? ""}
                     onChange={(event) =>
                         table.getColumn("title")?.setFilterValue(event.target.value)
