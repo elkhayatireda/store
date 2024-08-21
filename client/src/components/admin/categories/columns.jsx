@@ -133,9 +133,7 @@ const categoryColumns = [
                                 if (window.confirm('Are you sure you want to delete this category?')) {
                                     try {
                                         await deleteCategory(category._id)
-                                        toast.success('Category deleted successfully');
                                     } catch (error) {
-                                        toast.error('Failed to delete category');
                                         console.error('Delete error:', error);
                                     }
                                 }

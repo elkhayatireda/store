@@ -3,6 +3,7 @@ import { verifyTokenAdmin  } from "../controllers/verifytokenadmin.controller.js
 import {
     createProduct, getProducts, getProduct, updateProduct, deleteProduct, changeVisibility, deleteProducts, updateImages,
     getvariants, getCombinations, uploadImages, deleteImages,
+    getProductsAndCombinations,
   } from '../controllers/product.controller.js';
   import upload from '../config/upload.js';
 
@@ -11,6 +12,7 @@ const router = express.Router();
 router.post('/', upload.array('images', 10), createProduct);  
 router.post('/hide-show/:id', verifyTokenAdmin, changeVisibility);   
 router.get('/',verifyTokenAdmin, getProducts);
+router.get('/combinations',verifyTokenAdmin, getProductsAndCombinations);
 router.delete('/:id',verifyTokenAdmin, deleteProduct);
 router.post('/delete-multiple',verifyTokenAdmin, deleteProducts);
 

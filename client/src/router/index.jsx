@@ -18,6 +18,9 @@ import Categories from '@/pages/admin/categories';
 import Products from '@/pages/admin/products';
 import { CategoriesProvider } from '@/contexts/category';
 import { ProductsProvider } from '@/contexts/product';
+import AddOrder from '@/pages/admin/add-order';
+import { OrdersProvider } from '@/contexts/order';
+import Orders from '@/pages/admin/orders';
 // router
 export const router = createBrowserRouter([
     {
@@ -53,6 +56,14 @@ export const router = createBrowserRouter([
                 element: <ProductsProvider><Products /></ProductsProvider>
             },
             {
+                path: "/admin/orders/add",
+                element: <AddOrder />
+            },
+            {
+                path: "/admin/orders",
+                element: <OrdersProvider><Orders /></OrdersProvider>
+            },
+            {
                 path: "/admin/products/update/:id",
                 element: <ProductUpdate />
             },
@@ -60,7 +71,7 @@ export const router = createBrowserRouter([
     },
     {
         path: '*',
-        element: <h1>heyyyyyy</h1>
+        element: <h1>404, page not found</h1>
 
     }
 ])

@@ -1,5 +1,6 @@
 import { axiosClient } from '@/api/axios';
 import { createContext, useState, useEffect, useContext } from 'react';
+import { toast } from 'react-toastify';
 
 const CategoriesContext = createContext();
 
@@ -25,8 +26,10 @@ export const CategoriesProvider = ({ children }) => {
         try {
             await axiosClient.delete(`/categories/${categoryId}`);
             setData(prevData => prevData.filter(category => category._id !== categoryId));
+            toast.success('Category deleted successfully');
         } catch (error) {
             console.error('Error deleting category:', error);
+            toast.error('Failed to delete category');
         }
     };
 
@@ -34,8 +37,10 @@ export const CategoriesProvider = ({ children }) => {
         try {
             await axiosClient.post('/categories/delete-multiple', { ids: categoryIds });
             setData(prevData => prevData.filter(category => !categoryIds.includes(category._id)));
+            toast.success('Selected categories deleted successfully');
         } catch (error) {
             console.error('Error deleting multiple categories:', error);
+            toast.error('Failed to delete selected categories');
         }
     };
 

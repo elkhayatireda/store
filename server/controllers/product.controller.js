@@ -7,18 +7,18 @@ import cloudinary from '../config/cloudinaryConfig.js';
 // Create a new product
 export const createProduct = async (req, res) => {
   try {
-    const { 
-        categoryId, 
-        title, 
-        description, 
-        isVariant, 
-        comparePrice,
-        price,
-        differentPrice,
-        visible,
+    const {
+      categoryId,
+      title,
+      description,
+      isVariant,
+      comparePrice,
+      price,
+      differentPrice,
+      visible,
     } = req.body;
-    const  variants =  JSON.parse(req.body.variants);
-    const  combinations =  JSON.parse(req.body.combinations);
+    const variants = JSON.parse(req.body.variants);
+    const combinations = JSON.parse(req.body.combinations);
     const imageFiles = req.files;
 
     // let images = [];
@@ -27,26 +27,26 @@ export const createProduct = async (req, res) => {
     //     images.push(imageFile.path);
     // });
     const images = await Promise.all(imageFiles.map(async (imageFile, index) => {
-      const imagePath = imageFile.path; 
+      const imagePath = imageFile.path;
       return imagePath;
     }));
-  
+
     const url = await generateSlug(title);
 
-    let category = await Category.findById(categoryId); 
+    let category = await Category.findById(categoryId);
     let newProduct = new Product({
-        categoryId: category,
-        title,
-        comparePrice,
-        price,
-        differentPrice,
-        url,
-        images,
-        visible,
-        description,
-        isVariant,
+      categoryId: category,
+      title,
+      comparePrice,
+      price,
+      differentPrice,
+      url,
+      images,
+      visible,
+      description,
+      isVariant,
     });
-  
+
     if (isVariant) {
       const variantDocs = await Promise.all(variants.map(variant => {
         const newVariant = new Variant({
@@ -56,7 +56,7 @@ export const createProduct = async (req, res) => {
         });
         return newVariant.save();
       }));
-    
+
       const combinationDocs = await Promise.all(combinations.map(combination => {
         const variantValues = variantDocs.map(variantDoc => variantDoc._id);
         combination.variantIndices.forEach((elem) => {
@@ -72,17 +72,17 @@ export const createProduct = async (req, res) => {
         });
         return newCombination.save();
       }));
-    
+
       newProduct.variants = variantDocs.map(variantDoc => variantDoc._id);
       newProduct.combinations = combinationDocs.map(combinationDoc => combinationDoc._id);
       await newProduct.save();
     }
-    
+
     res.status(201).json(newProduct);
-} catch (error) {
+  } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Failed to create product' });
-}
+  }
 };
 const generateSlug = async (title) => {
   let url = title.trim().toLowerCase().replace(/\s+/g, '-');
@@ -139,7 +139,37 @@ export const deleteProduct = async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
-export const deleteProducts = async (req, res) => {
+
+export const getProductsAndCombinations = async (req, res) => {
+  try {
+    // Fetch all products and populate the categoryId field
+    const products = await Product.find().populate('categoryId');
+
+    // Iterate over each product to check if it's a variant
+    const productsWithCombinations = await Promise.all(
+      products.map(async (product) => {
+        if (product.isVariant) {
+          // Fetch combinations for the product
+          const combinations = await Combination.find({ product: product._id });
+
+          // Return the product with its combinations
+          return {
+            ...product.toObject(),
+            combinations,
+          };
+        } else {
+          // If no variants, return the product as is
+          return product.toObject();
+        }
+      })
+    );
+
+    res.status(200).json(productsWithCombinations);
+  } catch (error) {
+    console.error("Error fetching products:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};export const deleteProducts = async (req, res) => {
   try {
     const ids = req.body.ids;
     if (!ids || !Array.isArray(ids)) {

@@ -1,33 +1,34 @@
 import mongoose from "mongoose";
 
-const orderSchema = mongoose.Schema(
+const orderSchema = new mongoose.Schema(
     {
-        guestInfo: {
-            fullName: {
-                type: String,
-                required: true,
-            },
-            phone: {
-                type: String,
-                required: true,
-            },
-            address: {
-                type: String,
-                required: true,
-            },
+        customerId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Customer',
+            required: true,
         },
-        products: [
+        items: [
             {
-                productId: {
-                    type: mongoose.Schema.Types.ObjectId,
-                    ref: 'Product',
+                id: {
+                    type: String,
+                },
+                title: {
+                    type: String,
+                    required: true,
+                },
+                variant: {
+                    type: String,
+                    required: true,
+                },
+                image: {
+                    type: String,
                     required: true,
                 },
                 quantity: {
                     type: Number,
                     required: true,
                 },
-                price: {
+                unitPrice: {
                     type: Number,
                     required: true,
                 }

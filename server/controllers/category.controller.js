@@ -50,7 +50,8 @@ export const getCategories = async (req, res) => {
           title: 1,
           description: 1,
           imgPath: 1,
-          productCount: 1
+          productCount: 1,
+          createdAt: 1 // Include the creation date
         }
       }
     ]);

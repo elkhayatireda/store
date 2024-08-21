@@ -19,10 +19,10 @@ import {
 import { useState } from "react";
 import CustomInput from "@/components/custom/CustomInput";
 import { toast } from "react-toastify";
-import { useCategories } from "@/contexts/category";
+import { useOrders } from "@/contexts/order";
 
-export function CategoriesTable({ columns, data }) {
-    const { deleteMultipleCategories } = useCategories()
+export function OrdersTable({ columns, data }) {
+    const { deleteMultipleOrders } = useOrders()
 
     const [sorting, setSorting] = useState([]);
     const [columnFilters, setColumnFilters] = useState([])
@@ -54,15 +54,17 @@ export function CategoriesTable({ columns, data }) {
                         onClick={async () => {
                             const selectedRowIds = table.getFilteredSelectedRowModel().rows.map(row => row.original._id);
                             if (selectedRowIds.length > 0) {
-                                if (window.confirm('Are you sure you want to delete the selected categories?')) {
+                                if (window.confirm('Are you sure you want to delete the selected orders?')) {
                                     try {
-                                        await deleteMultipleCategories(selectedRowIds)
+                                        await deleteMultipleOrders(selectedRowIds)
+                                        toast.success('Selected orders deleted successfully');
                                     } catch (error) {
+                                        toast.error('Failed to delete selected orders');
                                         console.error('Delete error:', error);
                                     }
                                 }
                             } else {
-                                toast.info('No categories selected for deletion');
+                                toast.info('No orders selected for deletion');
                             }
                         }}
                         variant='destructive'
@@ -70,11 +72,13 @@ export function CategoriesTable({ columns, data }) {
                         Delete selected
                     </Button>
                 }
+            </div>
+            <div className="flex items-center py-4">
                 <CustomInput
-                    placeholder="Find category..."
-                    value={(table.getColumn("title")?.getFilterValue()) ?? ""}
+                    placeholder="Filter customer..."
+                    value={(table.getColumn("customer")?.getFilterValue()) ?? ""}
                     onChange={(event) =>
-                        table.getColumn("title")?.setFilterValue(event.target.value)
+                        table.getColumn("customer")?.setFilterValue(event.target.value)
                     }
                 />
             </div>
