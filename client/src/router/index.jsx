@@ -66,7 +66,7 @@ export const router = createBrowserRouter([
     },
     {
         path: '*',
-        element: <h1>heyyyyyy</h1>
+        element: <h1>404, page not found</h1>
 
     }
 ])

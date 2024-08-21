@@ -219,7 +219,7 @@ const orderColumns = [
                                         <div className="flex gap-2 items-start">
                                             <img className="w-9 h-9 rounded-full" src={item.image} alt={item.title} />
                                             <div>
-                                                <p className="text-sm">{item.title} - {item.variant}</p>
+                                                <p className="text-sm">{item.title}{item.variant != '-' && ` - ${item.variant}`}</p>
                                                 <p className="text-xs text-gray-400">{item.quantity} * {item.unitPrice}DH</p>
                                             </div>
                                         </div>

@@ -5,6 +5,9 @@ import {
     Headset,
     Users,
     BarChart,
+    ShoppingBag,
+    Folder,
+    Box,
 } from 'lucide-react';
 import TopNav from "../components/admin/TopNav";
 import { useState } from "react";
@@ -23,10 +26,10 @@ function AdminLayout() {
                 setExpanded={setExpanded}
             >
                 <SidebarItem icon={<BarChart size={22} />} text={'Dashboard'} location={"/admin/dashboard"} />
-                <SidebarItem icon={<Users size={22} />} text={'Clients'} location={"/admin/clients"} />
-                <SidebarItem icon={<Headset size={22} />} text={'Employees'} location={"/admin/employees"} />
-                <SidebarItem icon={<Headset size={22} />} text={'Contacts'} location={"/admin/contacts"} />
-                <SidebarItem icon={<Settings size={22} />} text={'Settings'} location={"/admin/settings"} />
+                <SidebarItem icon={<Folder size={22} />} text={'Categories'} location={"/admin/categories"} />
+                <SidebarItem icon={<Box size={22} />} text={'Products'} location={"/admin/products"} />
+                <SidebarItem icon={<ShoppingBag size={22} />} text={'Orders'} location={"/admin/orders"} />
+                <SidebarItem icon={<Users size={22} />} text={'Customers'} location={"/admin/customers"} />
             </SideBar>
             <main
                 className="transition-all duration-300 pb-4 pr-3"
