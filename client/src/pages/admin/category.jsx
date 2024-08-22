@@ -189,7 +189,7 @@ const CategoryForm = () => {
                 </div>
                 <div className='mt-5 flex justify-end'>
                     <Button
-                        className='bg-blue-600 text-white'
+                        className='bg-grenn-500 text-white'
                         type="submit"
                         disabled={loading}
                     >

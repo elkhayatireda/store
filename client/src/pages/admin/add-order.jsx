@@ -129,7 +129,7 @@ const AddOrder = () => {
 
     return (
         <div className='mt-24'>
-            <div className='flex justify-between items-center'>
+            <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-0'>
                 <Link
                     className='flex items-center gap-0.5 text-blue-500'
                     to={'/admin/orders'}
@@ -138,7 +138,7 @@ const AddOrder = () => {
                 </Link>
                 <div className='flex items-center gap-3'>
                     <Dialog>
-                        <DialogTrigger className='bg-blue-50 text-blue-800 px-2.5 py-1.5 rounded flex items-center gap-0.5'>
+                        <DialogTrigger className='bg-green-50 text-green-800 px-2.5 py-1.5 rounded flex items-center gap-0.5'>
                             View items <Eye size={16} />
                         </DialogTrigger>
                         <DialogContent>
@@ -162,7 +162,7 @@ const AddOrder = () => {
                         </DialogContent>
                     </Dialog>
                     <Dialog>
-                        <DialogTrigger className='bg-blue-950 text-white px-2.5 py-1.5 rounded'>
+                        <DialogTrigger disabled={orderItems.length == 0} className={`bg-primary text-white px-2.5 py-1.5 rounded ${orderItems.length == 0 && 'opacity-60 cursor-not-allowed'}`}>
                             Save order
                         </DialogTrigger>
                         <DialogContent>
@@ -269,11 +269,11 @@ const AddOrder = () => {
                 </div>
             </div>
 
-            <div className='mt-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4'>
+            <div className='mt-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4'>
                 {products.length > 0 ? (
                     products.map(product => (
                         <div className='p-2 border rounded-md' key={product._id}>
-                            <img className='object-cover' src={product.images[0]} alt={product.title} />
+                            <img className='object-cover w-full' src={product.images[0]} alt={product.title} />
                             <h2 className='font-medium capitalize'>{product.title}</h2>
                             <p className='text-sm text-gray-400'>{product.price}DH</p>
                             <Dialog>

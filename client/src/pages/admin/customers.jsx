@@ -59,7 +59,7 @@ function Customers() {
                     <p className='text-sm'>Here you can manage your clients</p>
                 </div>
                 <Dialog>
-                    <DialogTrigger className='flex items-center gap-1 px-3 py-1.5 rounded bg-blue-950 text-white'>
+                    <DialogTrigger className='flex items-center gap-1 px-3 py-1.5 rounded bg-primary text-white'>
                         Create <Plus size={18} />
                     </DialogTrigger>
                     <DialogContent>
