@@ -11,7 +11,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { toast } from 'react-toastify';
 import { Link } from 'react-router-dom';
-import { ChevronLeft } from 'lucide-react';
+import { ChevronLeft, Eye } from 'lucide-react';
 import { useCustomers } from '@/contexts/customer';
 
 const AddOrder = () => {
@@ -136,107 +136,137 @@ const AddOrder = () => {
                 >
                     <ChevronLeft size={18} /> Back
                 </Link>
-                <Dialog>
-                    <DialogTrigger className='bg-blue-950 text-white px-2.5 py-1.5 rounded'>
-                        Save order
-                    </DialogTrigger>
-                    <DialogContent>
-                        <DialogHeader>
-                            <DialogTitle>Client info</DialogTitle>
-                        </DialogHeader>
-                        <div className="space-y-4">
-                            <div className="flex justify-center items-center gap-4">
-                                <div>
-                                    <input
-                                        id='existing-cutomer'
-                                        className='w-[0.1px] h-[0.1px] opacity-0'
-                                        type="radio"
-                                        name="customerOption"
-                                        value="existing"
-                                        checked={!isCreatingNewCustomer}
-                                        onChange={() => setIsCreatingNewCustomer(false)}
-                                    />
-                                    <label
-                                        className={`text-sm cursor-pointer ${!isCreatingNewCustomer ? 'text-blue-500 font-medium' : 'text-gray-500 font-light'}`}
-                                        for='existing-cutomer'
-                                    >
-                                        Choose existing customer
-                                    </label>
-                                </div>
-                                <div>
-                                    <input
-                                        id='new-cutomer'
-                                        className='w-[0.1px] h-[0.1px] opacity-0'
-                                        type="radio"
-                                        name="customerOption"
-                                        value="new"
-                                        checked={isCreatingNewCustomer}
-                                        onChange={() => setIsCreatingNewCustomer(true)}
-                                    />
-                                    <label
-                                        className={`text-sm cursor-pointer ${isCreatingNewCustomer ? 'text-blue-500 font-medium' : 'text-gray-500 font-light'}`}
-                                        for='new-cutomer'
-                                    >
-                                        Create new customer
-                                    </label>
-                                </div>
+                <div className='flex items-center gap-3'>
+                    <Dialog>
+                        <DialogTrigger className='bg-blue-50 text-blue-800 px-2.5 py-1.5 rounded flex items-center gap-0.5'>
+                            View items <Eye size={16} />
+                        </DialogTrigger>
+                        <DialogContent>
+                            <DialogHeader>
+                                <DialogTitle>Order items</DialogTitle>
+                            </DialogHeader>
+                            <div className="h-56 overflow-auto">
+                                {
+                                    orderItems.map(item => (
+                                        <div className="flex gap-2 items-start border px-4 py-1 rounded-sm mb-2">
+                                            <img className="w-9 h-9 rounded-full" src={item.image} alt={item.title} />
+                                            <div>
+                                                <p className="text-sm">{item.title}{item.variant != '-' && ` - ${item.variant}`}</p>
+                                                <p className="text-xs text-gray-400">{item.quantity} * {item.unitPrice}DH</p>
+                                            </div>
+                                        </div>
+                                    ))
+                                }
                             </div>
-                            {!isCreatingNewCustomer && (
-                                <div className="space-y-2 py-1 h-56 overflow-auto">
-                                    {customers.map(customer => (
-                                        <label key={customer._id} className="flex items-center gap-2">
-                                            <input
-                                                type="radio"
-                                                name="selectedCustomer"
-                                                value={customer._id}
-                                                onChange={(e) => setSelectedCustomerId(e.target.value)}
-                                                checked={selectedCustomerId === customer._id}
-                                            />
-                                            <span>{customer.fullName} - {customer.phone}</span>
+                            <p className='w-fit ml-auto text-sm text-gray-500 font-medium'>Total: {calculateTotalPrice()}DH</p>
+                        </DialogContent>
+                    </Dialog>
+                    <Dialog>
+                        <DialogTrigger className='bg-blue-950 text-white px-2.5 py-1.5 rounded'>
+                            Save order
+                        </DialogTrigger>
+                        <DialogContent>
+                            <DialogHeader>
+                                <DialogTitle>Client info</DialogTitle>
+                            </DialogHeader>
+                            <div className="space-y-4">
+                                <div className="flex justify-center items-center gap-4">
+                                    <div>
+                                        <input
+                                            id='existing-cutomer'
+                                            className='w-[0.1px] h-[0.1px] opacity-0'
+                                            type="radio"
+                                            name="customerOption"
+                                            value="existing"
+                                            checked={!isCreatingNewCustomer}
+                                            onChange={() => setIsCreatingNewCustomer(false)}
+                                        />
+                                        <label
+                                            className={`text-sm cursor-pointer ${!isCreatingNewCustomer ? 'text-blue-500 font-medium' : 'text-gray-500 font-light'}`}
+                                            for='existing-cutomer'
+                                        >
+                                            Choose existing customer
                                         </label>
-                                    ))}
-                                </div>
-                            )}
-
-                            {isCreatingNewCustomer && (
-                                <div className="space-y-2">
-                                    <div>
-                                        <label>Full Name:</label>
-                                        <Input
-                                            type="text"
-                                            name="fullName"
-                                            value={newCustomerInfo.fullName}
-                                            onChange={handleNewCustomerInputChange}
-                                            required
-                                        />
                                     </div>
                                     <div>
-                                        <label>Phone:</label>
-                                        <Input
-                                            type="text"
-                                            name="phone"
-                                            value={newCustomerInfo.phone}
-                                            onChange={handleNewCustomerInputChange}
-                                            required
+                                        <input
+                                            id='new-cutomer'
+                                            className='w-[0.1px] h-[0.1px] opacity-0'
+                                            type="radio"
+                                            name="customerOption"
+                                            value="new"
+                                            checked={isCreatingNewCustomer}
+                                            onChange={() => setIsCreatingNewCustomer(true)}
                                         />
-                                    </div>
-                                    <div>
-                                        <label>Address:</label>
-                                        <Input
-                                            type="text"
-                                            name="address"
-                                            value={newCustomerInfo.address}
-                                            onChange={handleNewCustomerInputChange}
-                                            required
-                                        />
+                                        <label
+                                            className={`text-sm cursor-pointer ${isCreatingNewCustomer ? 'text-blue-500 font-medium' : 'text-gray-500 font-light'}`}
+                                            for='new-cutomer'
+                                        >
+                                            Create new customer
+                                        </label>
                                     </div>
                                 </div>
-                            )}
+                                {!isCreatingNewCustomer && (
+                                    <div className="py-1 h-56 overflow-auto">
+                                        {customers.map(customer => (
+                                            <div className="mb-2 flex items-center gap-2 hover:opacity-85" key={customer._id}>
+                                                <input
+                                                    id={`i-${customer._id}`}
+                                                    type="radio"
+                                                    name="selectedCustomer"
+                                                    value={customer._id}
+                                                    onChange={(e) => setSelectedCustomerId(e.target.value)}
+                                                    checked={selectedCustomerId === customer._id}
+                                                />
+                                                <label className='cursor-pointer flex items-center gap-2' for={`i-${customer._id}`}>
+                                                    <span className='font-medium'>{customer.fullName}</span>
+                                                    <span className='text-sm text-gray-500'>{customer.phone}</span>
+                                                </label>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
 
-                            <Button onClick={handleSaveOrder}>Save</Button>
-                        </div>
-                    </DialogContent>
-                </Dialog>
+                                {isCreatingNewCustomer && (
+                                    <div className="space-y-2">
+                                        <div>
+                                            <label>Full Name:</label>
+                                            <Input
+                                                type="text"
+                                                name="fullName"
+                                                value={newCustomerInfo.fullName}
+                                                onChange={handleNewCustomerInputChange}
+                                                required
+                                            />
+                                        </div>
+                                        <div>
+                                            <label>Phone:</label>
+                                            <Input
+                                                type="text"
+                                                name="phone"
+                                                value={newCustomerInfo.phone}
+                                                onChange={handleNewCustomerInputChange}
+                                                required
+                                            />
+                                        </div>
+                                        <div>
+                                            <label>Address:</label>
+                                            <Input
+                                                type="text"
+                                                name="address"
+                                                value={newCustomerInfo.address}
+                                                onChange={handleNewCustomerInputChange}
+                                                required
+                                            />
+                                        </div>
+                                    </div>
+                                )}
+
+                                <Button onClick={handleSaveOrder}>Save</Button>
+                            </div>
+                        </DialogContent>
+                    </Dialog>
+                </div>
             </div>
 
             <div className='mt-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4'>
