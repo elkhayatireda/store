@@ -59,7 +59,7 @@ export const router = createBrowserRouter([
             },
             {
                 path: "/admin/orders/add",
-                element: <AddOrder />
+                element: <CustomersProvider><AddOrder /></CustomersProvider>
             },
             {
                 path: "/admin/orders",

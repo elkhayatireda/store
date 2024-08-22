@@ -5,14 +5,11 @@ import Customer from '../models/customer.model.js';
 // Create a new order
 export const createOrder = async (req, res) => {
     try {
-        const { guestInfo, items, totalPrice, status } = req.body;
+        const { customerId, items, totalPrice, status } = req.body;
 
-        // Check if customer exists
-        let customer = await Customer.findOne({ phone: guestInfo.phone });
+        let customer = await Customer.findById(customerId);
         if (!customer) {
-            // Create a new customer if not found
-            customer = new Customer(guestInfo);
-            await customer.save();
+            return res.status(404).json({ message: 'Customer not found' });
         }
 
         const order = new Order({

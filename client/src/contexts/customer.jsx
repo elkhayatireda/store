@@ -56,9 +56,11 @@ export const CustomersProvider = ({ children }) => {
                 const response = await axiosClient.post('/customers', customerData);
                 setData(prevData => [...prevData, response.data]);
                 toast.success('Customer created successfully');
+                return response.data
             } catch (error) {
                 console.error('Error creating customer:', error);
                 toast.error('Failed to create customer');
+                return null
             }
         }
     };

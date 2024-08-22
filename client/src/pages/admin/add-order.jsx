@@ -12,12 +12,16 @@ import { Input } from '@/components/ui/input';
 import { toast } from 'react-toastify';
 import { Link } from 'react-router-dom';
 import { ChevronLeft } from 'lucide-react';
+import { useCustomers } from '@/contexts/customer';
 
 const AddOrder = () => {
+    const { data: customers, createCustomer } = useCustomers();  // Access customers and createCustomer function
     const [products, setProducts] = useState([]);
     const [orderItems, setOrderItems] = useState([]);
     const [selectedCombination, setSelectedCombination] = useState(null);
-    const [guestInfo, setGuestInfo] = useState({
+    const [selectedCustomerId, setSelectedCustomerId] = useState(null);  // For existing customer
+    const [isCreatingNewCustomer, setIsCreatingNewCustomer] = useState(false);  // Toggle between new or existing customer
+    const [newCustomerInfo, setNewCustomerInfo] = useState({
         fullName: '',
         phone: '',
         address: '',
@@ -45,12 +49,10 @@ const AddOrder = () => {
             );
 
             if (existingItemIndex !== -1) {
-                // If the item exists, update its quantity
                 const updatedOrderItems = [...prevOrderItems];
                 updatedOrderItems[existingItemIndex].quantity += Number(quantity);
                 return updatedOrderItems;
             } else {
-                // If the item doesn't exist, add it to the order
                 const newItem = {
                     id: product._id,
                     title: product.title,
@@ -64,11 +66,12 @@ const AddOrder = () => {
         });
 
         setSelectedCombination(null); // Reset the selected combination
+        toast.success('product added to order')
     };
 
-    const handleInputChange = (e) => {
+    const handleNewCustomerInputChange = (e) => {
         const { name, value } = e.target;
-        setGuestInfo(prevInfo => ({
+        setNewCustomerInfo(prevInfo => ({
             ...prevInfo,
             [name]: value,
         }));
@@ -79,8 +82,28 @@ const AddOrder = () => {
     };
 
     const handleSaveOrder = async () => {
+        let customerId = selectedCustomerId;
+
+        if (isCreatingNewCustomer) {
+            // Create a new customer if the admin chooses to do so
+            const customerData = {
+                fullName: newCustomerInfo.fullName,
+                phone: newCustomerInfo.phone,
+                address: newCustomerInfo.address,
+            };
+            const newCustomer = await createCustomer(customerData);  // This should automatically add the new customer to the context's data
+            console.log(newCustomer);
+
+            customerId = newCustomer ? newCustomer._id : null;
+        }
+
+        if (!customerId) {
+            toast.error("Customer information is required");
+            return;
+        }
+
         const order = {
-            guestInfo,
+            customerId,
             items: orderItems,
             totalPrice: calculateTotalPrice(),
             status: 'pending'
@@ -91,12 +114,13 @@ const AddOrder = () => {
             toast.success('Order created successfully');
             console.log('Order created successfully:', response.data);
             setOrderItems([]);
-            setGuestInfo({
+            setNewCustomerInfo({
                 fullName: '',
                 phone: '',
                 address: '',
-            })
-            setSelectedCombination(null)
+            });
+            setSelectedCustomerId(null);
+            setSelectedCombination(null);
         } catch (error) {
             toast.error('Error creating order');
             console.error('Error creating order:', error);
@@ -104,7 +128,7 @@ const AddOrder = () => {
     };
 
     return (
-        <div>
+        <div className='mt-24'>
             <div className='flex justify-between items-center'>
                 <Link
                     className='flex items-center gap-0.5 text-blue-500'
@@ -113,42 +137,102 @@ const AddOrder = () => {
                     <ChevronLeft size={18} /> Back
                 </Link>
                 <Dialog>
-                    <DialogTrigger className='bg-blue-950 text-white px-2.5 py-1.5 rounded'>Save order</DialogTrigger>
+                    <DialogTrigger className='bg-blue-950 text-white px-2.5 py-1.5 rounded'>
+                        Save order
+                    </DialogTrigger>
                     <DialogContent>
                         <DialogHeader>
                             <DialogTitle>Client info</DialogTitle>
                         </DialogHeader>
                         <div className="space-y-4">
-                            <div>
-                                <label>Full Name:</label>
-                                <Input
-                                    type="text"
-                                    name="fullName"
-                                    value={guestInfo.fullName}
-                                    onChange={handleInputChange}
-                                    required
-                                />
+                            <div className="flex justify-center items-center gap-4">
+                                <div>
+                                    <input
+                                        id='existing-cutomer'
+                                        className='w-[0.1px] h-[0.1px] opacity-0'
+                                        type="radio"
+                                        name="customerOption"
+                                        value="existing"
+                                        checked={!isCreatingNewCustomer}
+                                        onChange={() => setIsCreatingNewCustomer(false)}
+                                    />
+                                    <label
+                                        className={`text-sm cursor-pointer ${!isCreatingNewCustomer ? 'text-blue-500 font-medium' : 'text-gray-500 font-light'}`}
+                                        for='existing-cutomer'
+                                    >
+                                        Choose existing customer
+                                    </label>
+                                </div>
+                                <div>
+                                    <input
+                                        id='new-cutomer'
+                                        className='w-[0.1px] h-[0.1px] opacity-0'
+                                        type="radio"
+                                        name="customerOption"
+                                        value="new"
+                                        checked={isCreatingNewCustomer}
+                                        onChange={() => setIsCreatingNewCustomer(true)}
+                                    />
+                                    <label
+                                        className={`text-sm cursor-pointer ${isCreatingNewCustomer ? 'text-blue-500 font-medium' : 'text-gray-500 font-light'}`}
+                                        for='new-cutomer'
+                                    >
+                                        Create new customer
+                                    </label>
+                                </div>
                             </div>
-                            <div>
-                                <label>Phone:</label>
-                                <Input
-                                    type="text"
-                                    name="phone"
-                                    value={guestInfo.phone}
-                                    onChange={handleInputChange}
-                                    required
-                                />
-                            </div>
-                            <div>
-                                <label>Address:</label>
-                                <Input
-                                    type="text"
-                                    name="address"
-                                    value={guestInfo.address}
-                                    onChange={handleInputChange}
-                                    required
-                                />
-                            </div>
+                            {!isCreatingNewCustomer && (
+                                <div className="space-y-2 py-1 h-56 overflow-auto">
+                                    {customers.map(customer => (
+                                        <label key={customer._id} className="flex items-center gap-2">
+                                            <input
+                                                type="radio"
+                                                name="selectedCustomer"
+                                                value={customer._id}
+                                                onChange={(e) => setSelectedCustomerId(e.target.value)}
+                                                checked={selectedCustomerId === customer._id}
+                                            />
+                                            <span>{customer.fullName} - {customer.phone}</span>
+                                        </label>
+                                    ))}
+                                </div>
+                            )}
+
+                            {isCreatingNewCustomer && (
+                                <div className="space-y-2">
+                                    <div>
+                                        <label>Full Name:</label>
+                                        <Input
+                                            type="text"
+                                            name="fullName"
+                                            value={newCustomerInfo.fullName}
+                                            onChange={handleNewCustomerInputChange}
+                                            required
+                                        />
+                                    </div>
+                                    <div>
+                                        <label>Phone:</label>
+                                        <Input
+                                            type="text"
+                                            name="phone"
+                                            value={newCustomerInfo.phone}
+                                            onChange={handleNewCustomerInputChange}
+                                            required
+                                        />
+                                    </div>
+                                    <div>
+                                        <label>Address:</label>
+                                        <Input
+                                            type="text"
+                                            name="address"
+                                            value={newCustomerInfo.address}
+                                            onChange={handleNewCustomerInputChange}
+                                            required
+                                        />
+                                    </div>
+                                </div>
+                            )}
+
                             <Button onClick={handleSaveOrder}>Save</Button>
                         </div>
                     </DialogContent>
@@ -193,22 +277,20 @@ const AddOrder = () => {
                                                 ))}
                                             </div>
                                         )}
+                                        <div className='flex justify-between gap-2 mt-2'>
+                                            <Input type="number" min="1" defaultValue="1" id={`quantity - ${product._id}`} />
+                                            <Button onClick={() => {
+                                                const quantity = document.getElementById(`quantity - ${product._id}`).value;
+                                                handleAddToOrder(product, quantity)
+                                            }}>Add</Button>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <label>Quantity:</label>
-                                        <Input type="number" min="1" defaultValue="1" id={`quantity-${product._id}`} />
-                                    </div>
-                                    <Button onClick={() => {
-                                        const quantity = document.getElementById(`quantity-${product._id}`).value;
-                                        handleAddToOrder(product, quantity);
-                                        toast.success("product added to order")
-                                    }}>Add to order</Button>
                                 </DialogContent>
                             </Dialog>
                         </div>
                     ))
                 ) : (
-                    <p>No products available</p>
+                    <p>No products available.</p>
                 )}
             </div>
         </div>
