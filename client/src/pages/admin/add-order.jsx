@@ -12,6 +12,7 @@ import { toast } from 'react-toastify';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { ChevronLeft, Eye } from 'lucide-react';
 import CustomInput from '@/components/custom/CustomInput';
+import { Plus, Minus, Trash2 } from 'lucide-react';
 
 const AddOrder = () => {
     const navigate = useNavigate()
@@ -187,11 +188,60 @@ const AddOrder = () => {
                             <div className="h-56 overflow-auto">
                                 {
                                     orderItems.map(item => (
-                                        <div key={item.id + item.variant} className="flex gap-2 items-start border px-4 py-1 rounded-sm mb-2">
-                                            <img className="w-9 h-9 rounded-full" src={item.image} alt={item.title} />
-                                            <div>
+                                        <div key={item.id + item.variant} className="flex gap-2 items-start shadow p-1 rounded mb-3">
+                                            <img className="w-9 h-9 rounded-full object-cover" src={item.image} alt={item.title} />
+                                            <div className="flex-1">
                                                 <p className="text-sm">{item.title}{item.variant !== '-' && ` - ${item.variant}`}</p>
-                                                <p className="text-xs text-gray-400">{item.quantity} * {item.unitPrice}DH</p>
+                                                <p className="text-xs text-gray-400">{item.unitPrice}DH</p>
+                                            </div>
+                                            <div className="flex gap-3 items-center">
+                                                <div className='flex gap-1 items-center'>
+                                                    <Button
+                                                        className='p-1'
+                                                        disabled={item.quantity == 1}
+                                                        variant='ghost'
+                                                        onClick={() => {
+                                                            setOrderItems(prevOrderItems =>
+                                                                prevOrderItems.map(orderItem =>
+                                                                    orderItem.id === item.id && orderItem.variant === item.variant
+                                                                        ? { ...orderItem, quantity: Math.max(orderItem.quantity - 1, 1) }
+                                                                        : orderItem
+                                                                )
+                                                            );
+                                                        }}
+                                                    >
+                                                        <Minus size={14} />
+                                                    </Button>
+                                                    <span className='text-xs text-gray-600'>{item.quantity}</span>
+                                                    <Button
+                                                        className='p-1'
+                                                        variant='ghost'
+                                                        onClick={() => {
+                                                            setOrderItems(prevOrderItems =>
+                                                                prevOrderItems.map(orderItem =>
+                                                                    orderItem.id === item.id && orderItem.variant === item.variant
+                                                                        ? { ...orderItem, quantity: orderItem.quantity + 1 }
+                                                                        : orderItem
+                                                                )
+                                                            );
+                                                        }}
+                                                    >
+                                                        <Plus size={14} />
+                                                    </Button>
+                                                </div>
+                                                <Button
+                                                    className='p-1'
+                                                    variant='ghost'
+                                                    onClick={() => {
+                                                        setOrderItems(prevOrderItems =>
+                                                            prevOrderItems.filter(orderItem =>
+                                                                !(orderItem.id === item.id && orderItem.variant === item.variant)
+                                                            )
+                                                        );
+                                                    }}
+                                                >
+                                                    <Trash2 color='red' size={14} />
+                                                </Button>
                                             </div>
                                         </div>
                                     ))
