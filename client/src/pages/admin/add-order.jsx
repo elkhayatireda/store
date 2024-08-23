@@ -9,14 +9,16 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog";
 import { toast } from 'react-toastify';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { ChevronLeft, Eye } from 'lucide-react';
 import CustomInput from '@/components/custom/CustomInput';
 
 const AddOrder = () => {
+    const navigate = useNavigate()
     const { id } = useParams()
     const [products, setProducts] = useState([]);
     const [orderItems, setOrderItems] = useState([]);
+    const [searchQuery, setSearchQuery] = useState('');
     const [selectedCombination, setSelectedCombination] = useState(null);
     const [newCustomerInfo, setNewCustomerInfo] = useState({
         fullName: '',
@@ -146,6 +148,7 @@ const AddOrder = () => {
                 const response = await axiosClient.put('/orders/details/' + id, order);
                 toast.success('Order updated successfully');
                 console.log('Order updated successfully:', response.data);
+                navigate('/admin/orders')
             }
             setErrors({
                 fullName: '',
@@ -157,6 +160,11 @@ const AddOrder = () => {
             console.error('Error creating order:', error);
         }
     };
+
+    const filteredProducts = products.filter(product =>
+        product.title.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
 
     return (
         <div className='mt-24'>
@@ -239,9 +247,18 @@ const AddOrder = () => {
                 </div>
             </div>
 
+            <div className='mt-4 w-fit'>
+                <CustomInput
+                    type="text"
+                    placeholder="Search by title"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                />
+            </div>
+
             <div className='mt-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4'>
-                {products.length > 0 ? (
-                    products.map(product => (
+                {filteredProducts.length > 0 ? (
+                    filteredProducts.map(product => (
                         <div className='p-2 border rounded-md' key={product._id}>
                             <img className='object-cover w-full' src={product.images[0]} alt={product.title} />
                             <h2 className='font-medium capitalize'>{product.title}</h2>

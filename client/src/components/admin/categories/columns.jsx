@@ -119,12 +119,6 @@ const categoryColumns = [
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuItem
-                            onClick={() => navigator.clipboard.writeText(category._id)}
-                        >
-                            Copy category ID
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
                         <DropdownMenuItem className='text-blue-600'>
                             <Link to={'/admin/categories/' + category._id}>Update</Link>
                         </DropdownMenuItem>
