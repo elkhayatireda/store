@@ -27,9 +27,24 @@ export const CustomersProvider = ({ children }) => {
         const errors = {};
         const { fullName, phone, address } = customerData;
 
-        if (!fullName) errors.fullName = 'Full Name is required';
-        if (!phone) errors.phone = 'Phone number is required';
-        if (!address) errors.address = 'Address is required';
+        // Check if full name is provided and valid
+        if (!fullName) {
+            errors.fullName = 'Full Name is required';
+        } else if (!/^[a-zA-Z\s]+$/.test(fullName)) {
+            errors.fullName = 'Full Name must contain only letters and spaces';
+        }
+
+        // Check if phone number is provided and valid
+        if (!phone) {
+            errors.phone = 'Phone number is required';
+        } else if (!/^\d+$/.test(phone)) {
+            errors.phone = 'Phone number must contain only digits';
+        }
+
+        // Check if address is provided
+        if (!address) {
+            errors.address = 'Address is required';
+        }
 
         // Check for duplicate phone numbers
         try {
@@ -56,12 +71,14 @@ export const CustomersProvider = ({ children }) => {
                 const response = await axiosClient.post('/customers', customerData);
                 setData(prevData => [...prevData, response.data]);
                 toast.success('Customer created successfully');
-                return response.data
+                return true
             } catch (error) {
                 console.error('Error creating customer:', error);
                 toast.error('Failed to create customer');
-                return null
+                return false
             }
+        } else {
+            return false
         }
     };
 
@@ -77,10 +94,14 @@ export const CustomersProvider = ({ children }) => {
                     )
                 );
                 toast.success('Customer updated successfully');
+                return true
             } catch (error) {
                 console.error('Error updating customer:', error);
                 toast.error('Failed to update customer');
+                return false
             }
+        } else {
+            return false
         }
     };
 

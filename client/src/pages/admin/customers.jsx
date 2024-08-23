@@ -36,14 +36,13 @@ function Customers() {
 
         try {
             // Attempt to create a new customer using the context's function
-            await createCustomer(guestInfo);
-
-            // Reset the form if creation is successful
-            setGuestInfo({
-                fullName: '',
-                phone: '',
-                address: '',
-            });
+            const res = await createCustomer(guestInfo);
+            if (res)
+                setGuestInfo({
+                    fullName: '',
+                    phone: '',
+                    address: '',
+                });
         } catch (error) {
             console.error('Error creating customer:', error);
         } finally {
