@@ -5,6 +5,22 @@ export const createCustomer = async (req, res) => {
     try {
         const { fullName, phone, address } = req.body;
 
+        // Validate fullName: must be a string and contain only alphabetic characters and spaces
+        const fullNameRegex = /^[a-zA-Z\s]+$/;
+        if (typeof fullName !== 'string' || !fullNameRegex.test(fullName.trim())) {
+            return res.status(400).json({ message: "Full name is required and must contain only letters and spaces" });
+        }
+
+        // Validate phone: must be a number and not an empty string
+        const phoneRegex = /^\d+$/; // Allows only digits
+        if (typeof phone !== 'string' || !phoneRegex.test(phone.trim())) {
+            return res.status(400).json({ message: "Phone number is required and must contain only numbers" });
+        }
+
+        if (typeof address !== 'string' || address.trim() === '') {
+            return res.status(400).json({ message: "Address is required" });
+        }
+
         // Check if a customer with the same phone number already exists
         const existingCustomer = await Customer.findOne({ phone });
         if (existingCustomer) {
@@ -53,6 +69,22 @@ export const getCustomerById = async (req, res) => {
 export const updateCustomer = async (req, res) => {
     try {
         const { fullName, phone, address } = req.body;
+
+        // Validate fullName: must be a string and contain only alphabetic characters and spaces
+        const fullNameRegex = /^[a-zA-Z\s]+$/;
+        if (typeof fullName !== 'string' || !fullNameRegex.test(fullName.trim())) {
+            return res.status(400).json({ message: "Full name is required and must contain only letters and spaces" });
+        }
+
+        // Validate phone: must be a number and not an empty string
+        const phoneRegex = /^\d+$/; // Allows only digits
+        if (typeof phone !== 'string' || !phoneRegex.test(phone.trim())) {
+            return res.status(400).json({ message: "Phone number is required and must contain only numbers" });
+        }
+
+        if (typeof address !== 'string' || address.trim() === '') {
+            return res.status(400).json({ message: "Address is required" });
+        }
 
         // Check if a customer with the same phone number exists (excluding the current customer)
         const existingCustomer = await Customer.findOne({ phone });

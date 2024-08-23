@@ -71,6 +71,7 @@ export const CustomersProvider = ({ children }) => {
                 const response = await axiosClient.post('/customers', customerData);
                 setData(prevData => [...prevData, response.data]);
                 toast.success('Customer created successfully');
+                setValidationErrors({})
                 return true
             } catch (error) {
                 console.error('Error creating customer:', error);
@@ -94,6 +95,7 @@ export const CustomersProvider = ({ children }) => {
                     )
                 );
                 toast.success('Customer updated successfully');
+                setValidationErrors({})
                 return true
             } catch (error) {
                 console.error('Error updating customer:', error);

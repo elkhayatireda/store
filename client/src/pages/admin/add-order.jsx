@@ -274,7 +274,13 @@ const AddOrder = () => {
                                         <p className="text-sm text-gray-500">No variants available</p>
                                     )}
 
-                                    <Button onClick={() => handleAddToOrder(product, 1)}>Add</Button>
+                                    <div className='flex justify-between gap-2 mt-2'>
+                                        <CustomInput type="number" min="1" defaultValue="1" id={`quantity - ${product._id}`} />
+                                        <Button onClick={() => {
+                                            const quantity = document.getElementById(`quantity - ${product._id}`).value;
+                                            handleAddToOrder(product, quantity)
+                                        }}>Add</Button>
+                                    </div>
                                 </DialogContent>
                             </Dialog>
                         </div>

@@ -5,7 +5,27 @@ import Customer from '../models/customer.model.js';
 // Create a new order
 export const createOrder = async (req, res) => {
     try {
-        const { guestInfo, items, totalPrice, status } = req.body;
+        const { guestInfo, items, totalPrice } = req.body;
+
+        // Validate fullName: must be a string and contain only alphabetic characters and spaces
+        const fullNameRegex = /^[a-zA-Z\s]+$/;
+        if (typeof guestInfo.fullName !== 'string' || !fullNameRegex.test(guestInfo.fullName.trim())) {
+            return res.status(400).json({ message: "Full name is required and must contain only letters and spaces" });
+        }
+
+        // Validate phone: must be a number and not an empty string
+        const phoneRegex = /^\d+$/; // Allows only digits
+        if (typeof guestInfo.phone !== 'string' || !phoneRegex.test(guestInfo.phone.trim())) {
+            return res.status(400).json({ message: "Phone number is required and must contain only numbers" });
+        }
+
+        if (typeof guestInfo.address !== 'string' || guestInfo.address.trim() === '') {
+            return res.status(400).json({ message: "Address is required" });
+        }
+
+        if (items.length <= 0) {
+            res.status(400).json({ message: 'Order must contain at least one item' });
+        }
 
         let customer = await Customer.findOne({ phone: guestInfo.phone });
         if (!customer) {
@@ -22,7 +42,7 @@ export const createOrder = async (req, res) => {
             guestInfo,
             items: items,
             totalPrice: totalPrice,
-            status: status,
+            status: 'pending',
         });
 
         await order.save();
@@ -54,14 +74,27 @@ export const deleteOrder = async (req, res) => {
     }
 };
 
-// Update order status
 export const updateOrderStatus = async (req, res) => {
     try {
+        // Define allowed status values
+        const allowedStatuses = ['pending', 'confirmed', 'shipped', 'delivered', 'canceled'];
+
+        // Find the order by ID
         const order = await Order.findById(req.params.id);
 
         if (order) {
-            order.status = req.body.status || order.status;
+            // Extract status from the request body
+            const { status } = req.body;
 
+            // Validate status
+            if (status && !allowedStatuses.includes(status)) {
+                return res.status(400).json({ message: "Invalid status value" });
+            }
+
+            // Update order status if valid
+            order.status = status || order.status;
+
+            // Save the updated order
             const updatedOrder = await order.save();
             res.json(updatedOrder);
         } else {
