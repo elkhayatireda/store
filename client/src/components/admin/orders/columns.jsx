@@ -182,9 +182,9 @@ const orderColumns = [
                             <DropdownMenuLabel>Actions</DropdownMenuLabel>
                             <DropdownMenuItem onClick={() => setIsDetailsOpen(true)}>View details</DropdownMenuItem>
                             <DropdownMenuItem onClick={() => setIsStatusOpen(true)}>Edit status</DropdownMenuItem>
-                            {/* <DropdownMenuItem className='text-blue-600'>
-                            <Link to={'/admin/categories/' + order._id}>Update</Link>
-                        </DropdownMenuItem> */}
+                            <DropdownMenuItem className='text-blue-600'>
+                                <Link to={'/admin/orders/' + order._id}>Update order</Link>
+                            </DropdownMenuItem>
                             <DropdownMenuItem
                                 onClick={async () => {
                                     if (window.confirm('Are you sure you want to delete this order?')) {

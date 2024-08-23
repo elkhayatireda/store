@@ -58,7 +58,7 @@ export const router = createBrowserRouter([
                 element: <ProductsProvider><Products /></ProductsProvider>
             },
             {
-                path: "/admin/orders/add",
+                path: "/admin/orders/:id",
                 element: <CustomersProvider><AddOrder /></CustomersProvider>
             },
             {

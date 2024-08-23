@@ -9,11 +9,12 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog";
 import { toast } from 'react-toastify';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { ChevronLeft, Eye } from 'lucide-react';
 import CustomInput from '@/components/custom/CustomInput';
 
 const AddOrder = () => {
+    const { id } = useParams()
     const [products, setProducts] = useState([]);
     const [orderItems, setOrderItems] = useState([]);
     const [selectedCombination, setSelectedCombination] = useState(null);
@@ -29,16 +30,22 @@ const AddOrder = () => {
     });
 
     useEffect(() => {
-        const fetchProducts = async () => {
+        const fetchData = async () => {
             try {
                 const response = await axiosClient.get('/products/combinations');
                 setProducts(response.data);
+
+                if (id != 'add') {
+                    const response2 = await axiosClient.get('/orders/' + id);
+                    setOrderItems(response2.data.items);
+                    setNewCustomerInfo(response2.data.guestInfo);
+                }
             } catch (error) {
                 console.error("There was an error fetching the products!", error);
             }
         };
 
-        fetchProducts();
+        fetchData();
     }, []);
 
     const handleAddToOrder = (product, quantity) => {
@@ -125,15 +132,21 @@ const AddOrder = () => {
         };
 
         try {
-            const response = await axiosClient.post('/orders', order);
-            toast.success('Order created successfully');
-            console.log('Order created successfully:', response.data);
-            setOrderItems([]);
-            setNewCustomerInfo({
-                fullName: '',
-                phone: '',
-                address: '',
-            });
+            if (id == 'add') {
+                const response = await axiosClient.post('/orders', order);
+                toast.success('Order created successfully');
+                console.log('Order created successfully:', response.data);
+                setOrderItems([]);
+                setNewCustomerInfo({
+                    fullName: '',
+                    phone: '',
+                    address: '',
+                });
+            } else {
+                const response = await axiosClient.put('/orders/details/' + id, order);
+                toast.success('Order updated successfully');
+                console.log('Order updated successfully:', response.data);
+            }
             setErrors({
                 fullName: '',
                 phone: '',
