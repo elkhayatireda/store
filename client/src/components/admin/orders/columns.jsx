@@ -237,9 +237,13 @@ const orderColumns = [
                             setIsStatusOpen : setIsDetailsOpen}>
                         <DialogContent>
                             <DialogHeader>
-                                <DialogTitle>Edit status</DialogTitle>
+                                <DialogTitle>Order status</DialogTitle>
+                                <DialogDescription>
+                                    Edit order status
+                                </DialogDescription>
                             </DialogHeader>
                             <select
+                                className="outline-none p-2 border-2 rounded-md"
                                 value={status}
                                 onChange={handleStatusChange}
                             >
