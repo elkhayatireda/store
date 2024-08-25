@@ -101,12 +101,19 @@ const CategoryForm = () => {
             if (img) formData.append('img', img);
 
             try {
-                const url = id !== 'create' ? `/categories/${id}` : '/categories';
-                await axiosClient.post(url, formData, {
-                    headers: {
-                        'Content-Type': 'multipart/form-data',
-                    },
-                });
+                if (id == 'create') {
+                    await axiosClient.post('/categories', formData, {
+                        headers: {
+                            'Content-Type': 'multipart/form-data',
+                        },
+                    });
+                } else {
+                    await axiosClient.put(`/categories/${id}`, formData, {
+                        headers: {
+                            'Content-Type': 'multipart/form-data',
+                        },
+                    });
+                }
 
                 setTitle('');
                 setDescription('');
@@ -189,7 +196,7 @@ const CategoryForm = () => {
                 </div>
                 <div className='mt-5 flex justify-end'>
                     <Button
-                        className='bg-blue-600 text-white'
+                        className='bg-primary text-white'
                         type="submit"
                         disabled={loading}
                     >

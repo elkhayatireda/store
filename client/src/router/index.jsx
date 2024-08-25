@@ -23,6 +23,8 @@ import { ProductsProvider } from '@/contexts/product';
 import AddOrder from '@/pages/admin/add-order';
 import { OrdersProvider } from '@/contexts/order';
 import Orders from '@/pages/admin/orders';
+import Customers from '@/pages/admin/customers';
+import { CustomersProvider } from '@/contexts/customer';
 import CreateOrder from '@/pages/admin/add-review';
 import CreateCoupon from '@/pages/admin/add-coupon';
 import Reviews from '@/pages/admin/reviews';
@@ -64,8 +66,8 @@ export const router = createBrowserRouter([
                 element: <ProductsProvider><Products /></ProductsProvider>
             },
             {
-                path: "/admin/orders/add",
-                element: <AddOrder />
+                path: "/admin/orders/:id",
+                element: <CustomersProvider><AddOrder /></CustomersProvider>
             },
             {
                 path: "/admin/orders",
@@ -86,6 +88,10 @@ export const router = createBrowserRouter([
             {
                 path: "/admin/products/update/:id",
                 element: <ProductUpdate />
+            },
+            {
+                path: "/admin/customers",
+                element: <CustomersProvider><Customers /></CustomersProvider>
             },
             {
                 path: "/admin/reviews/update/:id",

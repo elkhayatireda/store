@@ -4,6 +4,16 @@ import cloudinary from '../config/cloudinaryConfig.js';
 
 export const createCategory = async (req, res) => {
   const { title, description } = req.body;
+
+  // Validate that title and description are non-empty strings
+  if (typeof title !== 'string' || title.trim() === '') {
+    return res.status(400).json({ message: "Title is required" });
+  }
+
+  if (typeof description !== 'string' || description.trim() === '') {
+    return res.status(400).json({ message: "Description is required" });
+  }
+
   try {
     // Check if a category with the same title already exists
     const existingCategory = await Category.findOne({ title });
@@ -91,6 +101,16 @@ export const getCategory = async (req, res) => {
 // Update a category
 export const updateCategory = async (req, res) => {
   const { title, description } = req.body;
+
+  // Validate that title and description are non-empty strings
+  if (typeof title !== 'string' || title.trim() === '') {
+    return res.status(400).json({ message: "Title is required" });
+  }
+
+  if (typeof description !== 'string' || description.trim() === '') {
+    return res.status(400).json({ message: "Description is required" });
+  }
+
   try {
     const category = await Category.findById(req.params.id);
     if (!category) {

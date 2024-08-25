@@ -5,27 +5,51 @@ import Customer from '../models/customer.model.js';
 // Create a new order
 export const createOrder = async (req, res) => {
     try {
-        const { guestInfo, items, totalPrice, status } = req.body;
+        const { guestInfo, items, totalPrice } = req.body;
 
-        // Check if customer exists
+        // Validate fullName: must be a string and contain only alphabetic characters and spaces
+        const fullNameRegex = /^[a-zA-Z\s]+$/;
+        if (typeof guestInfo.fullName !== 'string' || !fullNameRegex.test(guestInfo.fullName.trim())) {
+            return res.status(400).json({ message: "Full name is required and must contain only letters and spaces" });
+        }
+
+        // Validate phone: must be a number and not an empty string
+        const phoneRegex = /^\d+$/; // Allows only digits
+        if (typeof guestInfo.phone !== 'string' || !phoneRegex.test(guestInfo.phone.trim())) {
+            return res.status(400).json({ message: "Phone number is required and must contain only numbers" });
+        }
+
+        if (typeof guestInfo.address !== 'string' || guestInfo.address.trim() === '') {
+            return res.status(400).json({ message: "Address is required" });
+        }
+
+        if (items.length <= 0) {
+            res.status(400).json({ message: 'Order must contain at least one item' });
+        }
+
         let customer = await Customer.findOne({ phone: guestInfo.phone });
         if (!customer) {
-            // Create a new customer if not found
-            customer = new Customer(guestInfo);
+            customer = new Customer({
+                fullName: guestInfo.fullName,
+                phone: guestInfo.phone,
+                address: guestInfo.address,
+            });
+
             await customer.save();
         }
 
         const order = new Order({
-            customerId: customer._id,
+            guestInfo, // Keep guestInfo clean and focused
             items,
             totalPrice,
-            status
+            status: 'pending',
+            inBlacklist: customer.inBlacklist, // Use inBlacklist directly in the order
         });
 
-        const createdOrder = await order.save();
-        res.status(201).json(createdOrder);
+        await order.save();
+        res.status(201).json({ message: 'Order created successfully', order });
     } catch (error) {
-        res.status(400).json({ message: error.message });
+        res.status(500).json({ message: 'Error creating order', error: error.message });
     }
 };
 
@@ -51,14 +75,27 @@ export const deleteOrder = async (req, res) => {
     }
 };
 
-// Update order status
 export const updateOrderStatus = async (req, res) => {
     try {
+        // Define allowed status values
+        const allowedStatuses = ['pending', 'confirmed', 'shipped', 'delivered', 'canceled'];
+
+        // Find the order by ID
         const order = await Order.findById(req.params.id);
 
         if (order) {
-            order.status = req.body.status || order.status;
+            // Extract status from the request body
+            const { status } = req.body;
 
+            // Validate status
+            if (status && !allowedStatuses.includes(status)) {
+                return res.status(400).json({ message: "Invalid status value" });
+            }
+
+            // Update order status if valid
+            order.status = status || order.status;
+
+            // Save the updated order
             const updatedOrder = await order.save();
             res.json(updatedOrder);
         } else {
@@ -72,21 +109,11 @@ export const updateOrderStatus = async (req, res) => {
 // Get all orders
 export const getAllOrders = async (req, res) => {
     try {
-        // Fetch orders and populate customer information
-        const orders = await Order.find({}).populate('customerId');
+        // Fetch all orders from the database
+        const orders = await Order.find({});
 
-        // Transform each order to include guestInfo as expected by the frontend
-        const ordersWithGuestInfo = orders.map(order => ({
-            ...order.toObject(), // Convert the Mongoose document to a plain JavaScript object
-            guestInfo: {
-                fullName: order.customerId.fullName,
-                phone: order.customerId.phone,
-                address: order.customerId.address,
-                email: order.customerId.email,
-            }
-        }));
-
-        res.json(ordersWithGuestInfo);
+        // Respond with the orders
+        res.json(orders);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -96,21 +123,10 @@ export const getAllOrders = async (req, res) => {
 export const getOrderById = async (req, res) => {
     try {
         // Find the order by ID and populate the customer information
-        const order = await Order.findById(req.params.id).populate('customerId');
+        const order = await Order.findById(req.params.id);
 
         if (order) {
-            // Transform the order to include guestInfo as expected by the frontend
-            const orderWithGuestInfo = {
-                ...order.toObject(), // Convert the Mongoose document to a plain JavaScript object
-                guestInfo: {
-                    fullName: order.customerId.fullName,
-                    phone: order.customerId.phone,
-                    address: order.customerId.address,
-                    email: order.customerId.email,
-                }
-            };
-
-            res.json(orderWithGuestInfo);
+            res.json(order);
         } else {
             res.status(404).json({ message: 'Order not found' });
         }

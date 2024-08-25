@@ -15,7 +15,7 @@ function Categories() {
                     <p className='text-sm'>Here you can manage the categories in your store</p>
                 </div>
                 <Link
-                    className='flex items-center gap-1 px-3 py-1.5 rounded bg-blue-950 text-white'
+                    className='flex items-center gap-1 px-3 py-1.5 rounded bg-primary text-white'
                     to={'/admin/categories/create'}
                 >
                     Create <Plus size={18} />

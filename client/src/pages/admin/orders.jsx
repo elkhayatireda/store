@@ -3,9 +3,12 @@ import { Plus } from 'lucide-react';
 import { OrdersTable } from '@/components/admin/orders/table';
 import orderColumns from '@/components/admin/orders/columns';
 import { useOrders } from '@/contexts/order';
+import { axiosClient } from '@/api/axios';
 
 function Orders() {
     const { data } = useOrders()
+    console.log(data);
+
 
     return (
         <div>
@@ -15,12 +18,13 @@ function Orders() {
                     <p className='text-sm'>Here you can manage the orders of your clients</p>
                 </div>
                 <Link
-                    className='flex items-center gap-1 px-3 py-1.5 rounded bg-blue-950 text-white'
+                    className='flex items-center gap-1 px-3 py-1.5 rounded bg-primary text-white'
                     to={'/admin/orders/add'}
                 >
                     Create <Plus size={18} />
                 </Link>
             </div>
+            <p className='mt-2 text-sm'>Info: <span className='text-red-500'>red phone number</span> means client is in blacklist</p>
             <OrdersTable columns={orderColumns} data={data} />
         </div >
     );

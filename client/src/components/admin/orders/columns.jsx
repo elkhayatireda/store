@@ -47,6 +47,10 @@ const orderColumns = [
         enableHiding: false,
     },
     {
+        accessorKey: "ref",
+        header: "Ref",
+    },
+    {
         id: 'customer',
         accessorKey: "guestInfo.fullName",
         header: ({ column }) => {
@@ -65,7 +69,8 @@ const orderColumns = [
     {
         header: "Phone Number",
         cell: ({ row }) => {
-            return <span>
+            console.log(row.original.inBlacklist);
+            return <span className={`${row.original.inBlacklist && 'text-red-500'}`}>
                 {row.original.guestInfo.phone}
             </span>
         },
@@ -126,12 +131,20 @@ const orderColumns = [
             )
         },
         cell: ({ row }) => {
-            const date = new Date(row.original.createdAt)
-            const options = { year: 'numeric', month: 'long', day: 'numeric' };
-            const formattedDate = date.toLocaleDateString('fr-FR', options);
-            return <div>
-                {formattedDate}
-            </div>
+            const date = new Date(row.original.createdAt);
+
+            // Extract components from the date
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-based, so add 1
+            const day = String(date.getDate()).padStart(2, '0');
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            const seconds = String(date.getSeconds()).padStart(2, '0');
+
+            // Format date as y-m-d h:m:s
+            const formattedDate = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+
+            return <div>{formattedDate}</div>;
         }
     },
     {
@@ -182,9 +195,9 @@ const orderColumns = [
                             <DropdownMenuLabel>Actions</DropdownMenuLabel>
                             <DropdownMenuItem onClick={() => setIsDetailsOpen(true)}>View details</DropdownMenuItem>
                             <DropdownMenuItem onClick={() => setIsStatusOpen(true)}>Edit status</DropdownMenuItem>
-                            {/* <DropdownMenuItem className='text-blue-600'>
-                            <Link to={'/admin/categories/' + order._id}>Update</Link>
-                        </DropdownMenuItem> */}
+                            <DropdownMenuItem className='text-blue-600'>
+                                <Link to={'/admin/orders/' + order._id}>Update order</Link>
+                            </DropdownMenuItem>
                             <DropdownMenuItem
                                 onClick={async () => {
                                     if (window.confirm('Are you sure you want to delete this order?')) {
@@ -217,7 +230,7 @@ const orderColumns = [
                                 {order.items.map(item => (
                                     <div className="border px-4 py-1 rounded-sm mb-2">
                                         <div className="flex gap-2 items-start">
-                                            <img className="w-9 h-9 rounded-full" src={item.image} alt={item.title} />
+                                            <img className="w-9 h-9 object-cover rounded-full" src={item.image} alt={item.title} />
                                             <div>
                                                 <p className="text-sm">{item.title}{item.variant != '-' && ` - ${item.variant}`}</p>
                                                 <p className="text-xs text-gray-400">{item.quantity} * {item.unitPrice}DH</p>
@@ -237,9 +250,13 @@ const orderColumns = [
                             setIsStatusOpen : setIsDetailsOpen}>
                         <DialogContent>
                             <DialogHeader>
-                                <DialogTitle>Edit status</DialogTitle>
+                                <DialogTitle>Order status</DialogTitle>
+                                <DialogDescription>
+                                    Edit order status
+                                </DialogDescription>
                             </DialogHeader>
                             <select
+                                className="outline-none p-2 border-2 rounded-md"
                                 value={status}
                                 onChange={handleStatusChange}
                             >
