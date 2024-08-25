@@ -90,7 +90,7 @@ export default function TopNav() {
             </div>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-56 bg-white">
-            <DropdownMenuLabel>{userContext.user.email}</DropdownMenuLabel>
+            <DropdownMenuLabel>{userContext.email}</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem className="p-0">
               <div className='w-full h-full bg-[#356CF4] text-white py-2 px-3 flex items-center justify-center gap-2 cursor-pointer' onClick={logOut}>

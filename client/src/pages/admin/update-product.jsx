@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 import { authContext } from "../../contexts/AuthWrapper";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
-import { ImageUp, X, Image, Trash, Eye } from "lucide-react";
+import { ImageUp, X, Image, Trash, Save } from "lucide-react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import imageCompression from "browser-image-compression"; // Import the library
 import { undefined } from "zod";
@@ -294,6 +294,7 @@ export default function AddProduct() {
         toast.error("Something went wrong");
       }
     }
+    navigate("/admin/products");
   };
 
   // Helper function to generate Cartesian product (combinations)
@@ -429,18 +430,7 @@ export default function AddProduct() {
     }
   };
 
-  const handleBack = async () => {
-    try {
-      setIsLoading(true);
-      const response = await axiosClient.post("/products/delete-images", {
-        images: deletedImages,
-      });
-      setIsLoading(false);
-    } catch (error) {
-      console.error(error);
-      toast.error("Something went wrong");
-    }
-  };
+  
 
   useEffect(() => {
     if (!formData.isVariant) {
@@ -456,9 +446,9 @@ export default function AddProduct() {
       <div className="w-full fixed bottom-0 border-[1px] bg-white border-gray-200 right-0 left-0  flex items-center justify-end py-3 z-40 ">
         <button
           onClick={handleUpdate}
-          className="py-2 px-5 rounded-sm bg-green-500 text-white mr-5 text-lg"
+          className="py-2 px-5 rounded-sm bg-green-500 mr-5 flex items-center justify-center gap-2 cursor-pointer"
         >
-          save
+          <Save  color="white" /> <p className="text-white text-lg">save</p>
         </button>
       </div>
       {isLoading && (

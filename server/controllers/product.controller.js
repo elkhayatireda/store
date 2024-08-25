@@ -3,6 +3,7 @@ import Variant from '../models/variant.model.js';
 import Combination from '../models/combination.model.js';
 import Category from "../models/category.model.js";
 import cloudinary from '../config/cloudinaryConfig.js';
+import Order from '../models/order.model.js';
 
 // Create a new product
 export const createProduct = async (req, res) => {
@@ -21,18 +22,13 @@ export const createProduct = async (req, res) => {
     const combinations = JSON.parse(req.body.combinations);
     const imageFiles = req.files;
 
-    // let images = [];
-    // imageFiles.forEach((combination, index) => { 
-    //     const imageFile = imageFiles[index];
-    //     images.push(imageFile.path);
-    // });
     const images = await Promise.all(imageFiles.map(async (imageFile, index) => {
       const imagePath = imageFile.path;
       return imagePath;
     }));
 
     const url = await generateSlug(title);
-
+    
     let category = await Category.findById(categoryId);
     let newProduct = new Product({
       categoryId: category,
@@ -97,8 +93,31 @@ const generateSlug = async (title) => {
 // Get all products
 export const getProducts = async (req, res) => {
   try {
-    const products = await Product.find().populate('categoryId');
-    res.status(200).json(products);
+    const products = await Product.find()
+    .populate('categoryId', '_id title') // Populate categoryId with _id and title fields
+    .select('categoryId title price images visible createdAt'); // Select only the desired fields
+
+  // Count orders for each product
+  const productsWithOrderCount = await Promise.all(
+    products.map(async (product) => {
+      // Use aggregation to count the total quantity of the product in all orders
+      const orderCount = await Order.aggregate([
+        { $unwind: "$items" }, // Deconstruct the items array
+        { $match: { "items.id": product._id.toString() } }, // Match the product ID in items array
+        { $group: { _id: "$items.id", totalQuantity: { $sum: "$items.quantity" } } } // Sum the quantity of this product
+      ]);
+
+      // If the product is found in orders, retrieve the total quantity
+      const count = orderCount.length > 0 ? orderCount[0].totalQuantity : 0;
+
+      return {
+        ...product.toObject(),
+        orderCount: count,
+      };
+    })
+  );
+
+  res.status(200).json(productsWithOrderCount);
   } catch (error) {
     console.error("Error fetching products:", error);
     res.status(500).json({ message: "Internal server error" });
@@ -112,6 +131,7 @@ export const getProduct = async (req, res) => {
     if (!product) {
       return res.status(404).json({ message: "Product not found" });
     }
+    
     res.status(200).json(product);
   } catch (error) {
     console.error("Error fetching product:", error);
@@ -169,7 +189,8 @@ export const getProductsAndCombinations = async (req, res) => {
     console.error("Error fetching products:", error);
     res.status(500).json({ message: "Internal server error" });
   }
-};export const deleteProducts = async (req, res) => {
+};
+export const deleteProducts = async (req, res) => {
   try {
     const ids = req.body.ids;
     if (!ids || !Array.isArray(ids)) {

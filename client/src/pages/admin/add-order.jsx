@@ -97,6 +97,7 @@ const AddOrder = () => {
                 address: '',
             })
             setSelectedCombination(null)
+            
         } catch (error) {
             toast.error('Error creating order');
             console.error('Error creating order:', error);

@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 import { authContext } from "../../contexts/AuthWrapper";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
-import { ImageUp, X, Image, Trash, Eye } from "lucide-react";
+import { ImageUp, X, Image, Trash, ChevronLeft, Save  } from "lucide-react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import imageCompression from "browser-image-compression"; // Import the library
 
@@ -252,9 +252,9 @@ export default function AddProduct() {
       <div className="w-full fixed bottom-0 border-[1px] bg-white border-gray-200 right-0 left-0  flex items-center justify-end py-3 ">
         <button
           onClick={handleUpdate}
-          className="py-2 px-5 rounded-sm bg-green-500 text-white mr-5 text-lg"
+          className="py-2 px-5 rounded-sm bg-green-500 mr-5 flex items-center justify-center gap-2 cursor-pointer "
         >
-          save
+         <Save  color="white" /> <p className="text-white text-lg">save</p>
         </button>
       </div>
       {isLoading && (
@@ -264,6 +264,12 @@ export default function AddProduct() {
       )}
       <div className="w-full flex items-center justify-between mb-10">
         <h4 className="text-4xl font-semibold text-[#141414]">New Product</h4>
+        <Link
+                className='flex items-center gap-0.5 text-blue-500'
+                to={'/admin/products'}
+            >
+                <ChevronLeft size={18} /> Back
+            </Link>
       </div>
       <div>
         <div className="flex gap-10 pb-32 w-full items-start justify-center ">

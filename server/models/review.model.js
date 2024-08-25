@@ -13,9 +13,25 @@ const reviewSchema = mongoose.Schema(
             min: 1,
             max: 5,
         },
+        fullName: {
+            type: String,
+            required: true,
+        }, 
+        status: {
+            type: Boolean,
+            required: true,
+            default: true,
+        },
+        email: {
+            type: String,
+            required: true,
+        },
         comment: {
             type: String,
             required: true,
+        },
+        images: {
+            type: [String],
         }
     },
     {

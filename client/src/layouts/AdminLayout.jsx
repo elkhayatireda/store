@@ -1,13 +1,14 @@
 import { Outlet } from "react-router-dom";
 import SideBar, { SidebarItem } from "@/components/admin/sideBar";
 import {
-    Settings,
-    Headset,
+    MessageSquareText  ,
+    MessageSquare ,
     Users,
     BarChart,
-    ShoppingBag,
-    Folder,
-    Box,
+    ShoppingCart ,
+    Shapes ,
+    Package,
+    Tag ,
 } from 'lucide-react';
 import TopNav from "../components/admin/TopNav";
 import { useState } from "react";
@@ -25,11 +26,13 @@ function AdminLayout() {
                 expanded={expanded}
                 setExpanded={setExpanded}
             >
-                <SidebarItem icon={<BarChart size={22} />} text={'Dashboard'} location={"/admin/dashboard"} />
-                <SidebarItem icon={<Folder size={22} />} text={'Categories'} location={"/admin/categories"} />
-                <SidebarItem icon={<Box size={22} />} text={'Products'} location={"/admin/products"} />
-                <SidebarItem icon={<ShoppingBag size={22} />} text={'Orders'} location={"/admin/orders"} />
-                <SidebarItem icon={<Users size={22} />} text={'Customers'} location={"/admin/customers"} />
+                <SidebarItem icon={<BarChart size={21} />} text={'Dashboard'} location={"/admin/dashboard"} />
+                <SidebarItem icon={<Package size={21} />} text={'Products'} location={"/admin/products"} />
+                <SidebarItem icon={<ShoppingCart  size={21} />} text={'Orders'} location={"/admin/orders"} />
+                <SidebarItem icon={<Shapes  size={21} />} text={'Categories'} location={"/admin/categories"} />
+                <SidebarItem icon={<MessageSquareText    size={21} />} text={'Reviews'} location={"/admin/reviews"} />
+                <SidebarItem icon={<Tag  size={21} />} text={'Coupons'} location={"/admin/coupons"} />
+                <SidebarItem icon={<Users size={21} />} text={'Customers'} location={"/admin/customers"} />
             </SideBar>
             <main
                 className="transition-all duration-300 pb-4 pr-3"

@@ -105,7 +105,7 @@ const productColumns = [
     header: "price",
   },
   {
-    accessorKey: "orders",
+    accessorKey: "orderCount",
     header: "orders",
   },
   {
@@ -132,6 +132,7 @@ const productColumns = [
     header: ({ column }) => {
       return (
         <Button
+          className="p-0"
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
@@ -139,6 +140,22 @@ const productColumns = [
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
+    },
+    cell: ({ row }) => {
+      const date = new Date(row.original.createdAt);
+      const options = {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: false,
+      };
+      const formattedDate = date
+        .toLocaleString("fr-FR", options)
+        .replace(",", "");
+      return <div>{formattedDate}</div>;
     },
   },
   {

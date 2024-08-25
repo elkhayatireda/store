@@ -18,10 +18,10 @@ export default function SideBar({ children, expanded, setExpanded }) {
                     </h1>
                     <Button
                         variant='ghost'
-                        className='p-1 hover:bg-transparent hover:text-white hover:opacity-80'
+                        className='p-1 hover:bg-transparent hover:text-white hover:opacity-80 text-gray-300'
                         onClick={() => setExpanded((curr) => !curr)}
                     >
-                        {expanded ? <X /> : <LayoutDashboard />}
+                        {expanded ? <X color="white"/> : <LayoutDashboard />}
                     </Button>
                 </div>
 
@@ -41,10 +41,10 @@ export function SidebarItem({ icon, text, location, alert }) {
             to={location}
             className={`my-3 relative flex items-center justify-center font-medium rounded-md cursor-pointer transition-colors group`}
         >
-            <div className={`link p-1 group flex items-center gap-1 ${expanded ? "w-full" : "w-fit"} rounded hover:bg-blue-50 hover:text-blue-950`}>
+            <div className={`link p-1 group flex items-center gap-1 text-gray-300 ${expanded ? "w-full" : "w-fit"} rounded hover:bg-blue-50 hover:text-blue-950 px-2`}>
                 {icon}
                 <span
-                    className={`overflow-hidden transition-all ${expanded ? "pl-3" : "hidden"}`}
+                    className={`overflow-hidden transition-all text-sm  group-hover:text-blue-950 ${expanded ? "pl-3" : "hidden"}`}
                 >
                     {text}
                 </span>

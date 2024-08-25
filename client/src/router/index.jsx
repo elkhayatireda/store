@@ -14,6 +14,8 @@ import AdminSingnIn from '@/pages/admin/signin';
 import AdminAddProduct from '@/pages/admin/add-product';
 import CategoryForm from '@/pages/admin/category';
 import ProductUpdate from '@/pages/admin/update-product';
+import ReviewUpdate from '@/pages/admin/update-review';
+import CouponUpdate from '@/pages/admin/update-coupon';
 import Categories from '@/pages/admin/categories';
 import Products from '@/pages/admin/products';
 import { CategoriesProvider } from '@/contexts/category';
@@ -21,6 +23,12 @@ import { ProductsProvider } from '@/contexts/product';
 import AddOrder from '@/pages/admin/add-order';
 import { OrdersProvider } from '@/contexts/order';
 import Orders from '@/pages/admin/orders';
+import CreateOrder from '@/pages/admin/add-review';
+import CreateCoupon from '@/pages/admin/add-coupon';
+import Reviews from '@/pages/admin/reviews';
+import Coupons from '@/pages/admin/coupons';
+import { ReviewsProvider } from '@/contexts/review';
+import { CouponsProvider } from '@/contexts/coupon';
 // router
 export const router = createBrowserRouter([
     {
@@ -64,8 +72,32 @@ export const router = createBrowserRouter([
                 element: <OrdersProvider><Orders /></OrdersProvider>
             },
             {
+                path: "/admin/reviews",
+                element: <ReviewsProvider><Reviews /></ReviewsProvider>
+            },
+            {
+                path: "/admin/reviews/create",
+                element: <CreateOrder />
+            },
+            {
+                path: "/admin/coupons/create",
+                element: <CreateCoupon />
+            },
+            {
                 path: "/admin/products/update/:id",
                 element: <ProductUpdate />
+            },
+            {
+                path: "/admin/reviews/update/:id",
+                element: <ReviewUpdate />
+            },
+            {
+                path: "/admin/coupons/update/:id",
+                element: <CouponUpdate />
+            },
+            {
+                path: "/admin/coupons",
+                element: <CouponsProvider><Coupons /></CouponsProvider>
             },
         ]
     },
