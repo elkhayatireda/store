@@ -44,9 +44,16 @@ export function CustomersTable({ columns, data }) {
 
     return (
         <div>
-            <div className="flex items-center justify-end">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-start sm:justify-end gap-2">
                 <CustomInput
-                    placeholder="Find customer..."
+                    placeholder="Find by phone..."
+                    value={(table.getColumn("phone")?.getFilterValue()) ?? ""}
+                    onChange={(event) =>
+                        table.getColumn("phone")?.setFilterValue(event.target.value)
+                    }
+                />
+                <CustomInput
+                    placeholder="Find by name..."
                     value={(table.getColumn("fullName")?.getFilterValue()) ?? ""}
                     onChange={(event) =>
                         table.getColumn("fullName")?.setFilterValue(event.target.value)
