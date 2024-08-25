@@ -1,4 +1,5 @@
 import Customer from '../models/customer.model.js';
+import Order from '../models/order.model.js';
 
 // Create a New Customer
 export const createCustomer = async (req, res) => {
@@ -68,7 +69,7 @@ export const getCustomerById = async (req, res) => {
 // Update a Customer
 export const updateCustomer = async (req, res) => {
     try {
-        const { fullName, phone, address } = req.body;
+        const { fullName, phone, address, inBlacklist } = req.body;
 
         // Validate fullName: must be a string and contain only alphabetic characters and spaces
         const fullNameRegex = /^[a-zA-Z\s]+$/;
@@ -86,22 +87,34 @@ export const updateCustomer = async (req, res) => {
             return res.status(400).json({ message: "Address is required" });
         }
 
-        // Check if a customer with the same phone number exists (excluding the current customer)
         const existingCustomer = await Customer.findOne({ phone });
         if (existingCustomer && existingCustomer._id.toString() !== req.params.id) {
             return res.status(400).json({ message: "There is another customer with this phone number" });
         }
 
-        // Find the customer by ID
         const customer = await Customer.findById(req.params.id);
 
         if (customer) {
-            // Update the fields only if new data is provided
+            const oldPhone = customer.phone;
+            const oldInBlacklist = customer.inBlacklist;
             customer.fullName = fullName ?? customer.fullName;
             customer.phone = phone ?? customer.phone;
             customer.address = address ?? customer.address;
+            customer.inBlacklist = inBlacklist ?? customer.inBlacklist;
 
-            // Save the updated customer
+            if (phone && phone !== oldPhone) {
+                await Order.updateMany(
+                    { "guestInfo.phone": oldPhone }, // Find orders with the old phone number
+                    { $set: { "guestInfo.phone": phone } } // Update to the new phone number
+                );
+            }
+            if (inBlacklist !== undefined && inBlacklist !== oldInBlacklist) {
+                await Order.updateMany(
+                    { "guestInfo.phone": customer.phone },
+                    { $set: { "inBlacklist": inBlacklist } }
+                );
+            }
+
             const updatedCustomer = await customer.save();
             res.status(200).json(updatedCustomer);
         } else {

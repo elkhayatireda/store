@@ -15,6 +15,10 @@ const customerSchema = new mongoose.Schema(
             type: String,
             required: true,
         },
+        inBlacklist: {
+            type: Boolean,
+            default: false,  // Setting default value to false
+        },
     },
     {
         timestamps: true,

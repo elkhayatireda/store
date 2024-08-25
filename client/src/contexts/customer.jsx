@@ -95,15 +95,16 @@ export const CustomersProvider = ({ children }) => {
                     )
                 );
                 toast.success('Customer updated successfully');
-                setValidationErrors({})
-                return true
+                setValidationErrors({});
+                return true;
             } catch (error) {
                 console.error('Error updating customer:', error);
                 toast.error('Failed to update customer');
-                return false
+                return false;
             }
         } else {
-            return false
+            setValidationErrors(errors);
+            return false;
         }
     };
 

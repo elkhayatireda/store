@@ -39,10 +39,11 @@ export const createOrder = async (req, res) => {
         }
 
         const order = new Order({
-            guestInfo,
-            items: items,
-            totalPrice: totalPrice,
+            guestInfo, // Keep guestInfo clean and focused
+            items,
+            totalPrice,
             status: 'pending',
+            inBlacklist: customer.inBlacklist, // Use inBlacklist directly in the order
         });
 
         await order.save();

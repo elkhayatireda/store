@@ -20,6 +20,7 @@ import {
 import { toast } from "react-toastify";
 import CustomInput from "@/components/custom/CustomInput";
 import { useCustomers } from "@/contexts/customer";
+import { Checkbox } from "@/components/ui/checkbox";
 
 const customerColumns = [
     {
@@ -52,6 +53,15 @@ const customerColumns = [
         header: "Phone",
     },
     {
+        id: "inBlacklist",
+        header: "Blacklisted",
+        cell: ({ row }) => {
+            return <span className={`font-medium ${row.original.inBlacklist ? 'text-red-500' : 'text-green-500'}`}>
+                {row.original.inBlacklist ? 'yes' : 'no'}
+            </span>
+        },
+    },
+    {
         accessorKey: "createdAt",
         header: ({ column }) => (
             <Button
@@ -65,8 +75,19 @@ const customerColumns = [
         ),
         cell: ({ row }) => {
             const date = new Date(row.original.createdAt);
-            const options = { year: 'numeric', month: 'long', day: 'numeric' };
-            return <div>{date.toLocaleDateString('fr-FR', options)}</div>;
+
+            // Extract components from the date
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-based, so add 1
+            const day = String(date.getDate()).padStart(2, '0');
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            const seconds = String(date.getSeconds()).padStart(2, '0');
+
+            // Format date as y-m-d h:m:s
+            const formattedDate = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+
+            return <div>{formattedDate}</div>;
         }
     },
     {
@@ -79,13 +100,19 @@ const customerColumns = [
                 fullName: customer.fullName || '',
                 phone: customer.phone || '',
                 address: customer.address || '',
+                inBlacklist: customer.inBlacklist || false,
             });
+
             const [saving, setSaving] = useState(false);
 
             const handleInputChange = (e) => {
-                const { name, value } = e.target;
-                setGuestInfo((prev) => ({ ...prev, [name]: value }));
+                const { name, type, checked, value } = e.target;
+                setGuestInfo((prev) => ({
+                    ...prev,
+                    [name]: type === 'checkbox' ? checked : value, // Use checked for checkboxes
+                }));
             };
+
 
             const handleSave = async () => {
                 setSaving(true);
@@ -169,6 +196,16 @@ const customerColumns = [
                                 {validationErrors.address && (
                                     <p className="text-red-500 text-sm">{validationErrors.address}</p>
                                 )}
+                            </div>
+                            <div>
+                                <input
+                                    type="checkbox"
+                                    id="blacklist"
+                                    name="inBlacklist"
+                                    checked={guestInfo.inBlacklist}
+                                    onChange={handleInputChange}
+                                />
+                                <label htmlFor='blacklist'>Blacklisted</label>
                             </div>
                             <Button onClick={handleSave} disabled={saving}>
                                 {saving ? 'Saving...' : 'Save'}

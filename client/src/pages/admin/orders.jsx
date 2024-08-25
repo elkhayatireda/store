@@ -8,7 +8,7 @@ import { axiosClient } from '@/api/axios';
 function Orders() {
     const { data } = useOrders()
     console.log(data);
-    
+
 
     return (
         <div>
@@ -24,6 +24,7 @@ function Orders() {
                     Create <Plus size={18} />
                 </Link>
             </div>
+            <p className='mt-2 text-sm'>Info: <span className='text-red-500'>red phone number</span> means client is in blacklist</p>
             <OrdersTable columns={orderColumns} data={data} />
         </div >
     );

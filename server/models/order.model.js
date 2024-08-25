@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import Counter from './counter.model.js'; 
+import Counter from './counter.model.js';
 
 const orderSchema = new mongoose.Schema(
     {
@@ -20,6 +20,10 @@ const orderSchema = new mongoose.Schema(
                 type: String,
                 required: true,
             },
+        },
+        inBlacklist: {
+            type: Boolean,
+            default: false, // Ensure a default in case of schema updates
         },
         items: [
             {
