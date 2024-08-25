@@ -47,6 +47,10 @@ const orderColumns = [
         enableHiding: false,
     },
     {
+        accessorKey: "ref",
+        header: "Ref",
+    },
+    {
         id: 'customer',
         accessorKey: "guestInfo.fullName",
         header: ({ column }) => {

@@ -7,6 +7,8 @@ import { axiosClient } from '@/api/axios';
 
 function Orders() {
     const { data } = useOrders()
+    console.log(data);
+    
 
     return (
         <div>
