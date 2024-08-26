@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/dialog";
 import { toast } from 'react-toastify';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { ChevronLeft, Eye } from 'lucide-react';
+import { ChevronLeft, Eye, Save } from 'lucide-react';
 import CustomInput from '@/components/custom/CustomInput';
 import { Plus, Minus, Trash2 } from 'lucide-react';
 
@@ -67,7 +67,7 @@ const AddOrder = () => {
                 const newItem = {
                     id: product._id,
                     title: product.title,
-                    image: selectedCombination && selectedCombination.image ? selectedCombination.image : product.images[0],
+                    image: (selectedCombination && selectedCombination.image) ? selectedCombination.image : product.images[0],
                     unitPrice: selectedCombination ? selectedCombination.price : product.price,
                     variant: selectedCombination ? selectedCombination.combination : '-',
                     quantity: Number(quantity),
@@ -156,7 +156,7 @@ const AddOrder = () => {
                 phone: '',
                 address: '',
             });
-            
+
         } catch (error) {
             toast.error('Error creating order');
             console.error('Error creating order:', error);
@@ -177,10 +177,10 @@ const AddOrder = () => {
                 >
                     <ChevronLeft size={18} /> Back
                 </Link>
-                <div className='flex items-center gap-3'>
+                <div className="w-full fixed bottom-0 border bg-white border-gray-200 right-0 left-0  flex items-center justify-end p-3 gap-3">
                     <Dialog>
                         <DialogTrigger className='bg-green-50 text-green-800 px-2.5 py-1.5 rounded flex items-center gap-0.5'>
-                            View items <Eye size={16} />
+                            <Eye size={16} /> View items
                         </DialogTrigger>
                         <DialogContent>
                             <DialogHeader>
@@ -252,8 +252,8 @@ const AddOrder = () => {
                         </DialogContent>
                     </Dialog>
                     <Dialog>
-                        <DialogTrigger disabled={orderItems.length === 0} className={`bg-primary text-white px-2.5 py-1.5 rounded ${orderItems.length === 0 && 'opacity-60 cursor-not-allowed'}`}>
-                            Save order
+                        <DialogTrigger disabled={orderItems.length === 0} className={`bg-primary text-white px-2.5 py-1.5 rounded flex items-center gap-1 ${orderItems.length === 0 && 'opacity-60 cursor-not-allowed'}`}>
+                            <Save size={18} /> Save order
                         </DialogTrigger>
                         <DialogContent>
                             <DialogHeader>
@@ -333,7 +333,7 @@ const AddOrder = () => {
                                                     onChange={() => setSelectedCombination(variation)}
                                                 />
                                                 <label htmlFor={variation._id} className="flex gap-2 items-center">
-                                                    <img className='w-7 h-7 rounded-full' src={variation.image} alt={variation.combination} />
+                                                    <img className='w-7 h-7 rounded-full object-cover' src={variation.image || product.images[0]} alt={variation.combination} />
                                                     <span>{variation.combination} ({variation.price}DH)</span>
                                                 </label>
                                             </div>
@@ -342,7 +342,7 @@ const AddOrder = () => {
                                         <p className="text-sm text-gray-500">No variants available</p>
                                     )}
 
-                                    <div className='flex justify-between gap-2 mt-2'>
+                                    <div className='flex items-center justify-end gap-2 mt-2'>
                                         <CustomInput type="number" min="1" defaultValue="1" id={`quantity - ${product._id}`} />
                                         <Button onClick={() => {
                                             const quantity = document.getElementById(`quantity - ${product._id}`).value;

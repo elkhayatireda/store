@@ -3,12 +3,9 @@ import { Plus } from 'lucide-react';
 import { OrdersTable } from '@/components/admin/orders/table';
 import orderColumns from '@/components/admin/orders/columns';
 import { useOrders } from '@/contexts/order';
-import { axiosClient } from '@/api/axios';
 
 function Orders() {
     const { data } = useOrders()
-    console.log(data);
-
 
     return (
         <div>

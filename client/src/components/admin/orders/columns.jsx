@@ -47,8 +47,13 @@ const orderColumns = [
         enableHiding: false,
     },
     {
-        accessorKey: "ref",
+        id: "ref",
         header: "Ref",
+        cell: ({ row }) => {
+            return <span className='text-blue-700'>
+                #0{row.original.ref}
+            </span>
+        },
     },
     {
         id: 'customer',
@@ -197,6 +202,9 @@ const orderColumns = [
                             <DropdownMenuItem onClick={() => setIsStatusOpen(true)}>Edit status</DropdownMenuItem>
                             <DropdownMenuItem className='text-blue-600'>
                                 <Link to={'/admin/orders/' + order._id}>Update order</Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem className='text-gray-600'>
+                                <Link to={'/admin/print/' + order._id}>Print order</Link>
                             </DropdownMenuItem>
                             <DropdownMenuItem
                                 onClick={async () => {
