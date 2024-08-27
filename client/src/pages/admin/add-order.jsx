@@ -19,6 +19,7 @@ const AddOrder = () => {
     const { id } = useParams()
     const [products, setProducts] = useState([]);
     const [orderItems, setOrderItems] = useState([]);
+    const [ref, setRef] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedCombination, setSelectedCombination] = useState(null);
     const [newCustomerInfo, setNewCustomerInfo] = useState({
@@ -42,6 +43,7 @@ const AddOrder = () => {
                     const response2 = await axiosClient.get('/orders/' + id);
                     setOrderItems(response2.data.items);
                     setNewCustomerInfo(response2.data.guestInfo);
+                    setRef(response2.data.ref)
                 }
             } catch (error) {
                 console.error("There was an error fetching the products!", error);
@@ -158,8 +160,8 @@ const AddOrder = () => {
             });
 
         } catch (error) {
-            toast.error('Error creating order');
-            console.error('Error creating order:', error);
+            toast.error('Error');
+            console.error('Error:', error);
         }
     };
 
@@ -171,131 +173,144 @@ const AddOrder = () => {
     return (
         <div className='mt-24'>
             <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-0'>
+                <div>
+                    <h2 className='text-lg font-medium'>
+                        {id == 'add' ? 'Create a new order' : `Updating order #0${ref}`}
+                    </h2>
+                    <p className='text-xs text-gray-600 max-w-[600px]'>
+                        {id === 'add' ?
+                            'Select items to add to the order. Once done, click on "View Items" on the bottom to review your selections. After that, enter the customer\'s information and save your order.'
+                            :
+                            'Add more items to the order if needed. You can review the items by clicking on "View Items" on the bottom. Once satisfied, you can either save the order or update the customer information.'
+                        }
+                    </p>
+
+                </div>
                 <Link
                     className='flex items-center gap-0.5 text-blue-500'
                     to={'/admin/orders'}
                 >
                     <ChevronLeft size={18} /> Back
                 </Link>
-                <div className="w-full fixed bottom-0 border bg-white border-gray-200 right-0 left-0  flex items-center justify-end p-3 gap-3">
-                    <Dialog>
-                        <DialogTrigger className='bg-green-50 text-green-800 px-2.5 py-1.5 rounded flex items-center gap-0.5'>
-                            <Eye size={16} /> View items
-                        </DialogTrigger>
-                        <DialogContent>
-                            <DialogHeader>
-                                <DialogTitle>Order items</DialogTitle>
-                            </DialogHeader>
-                            <div className="h-56 overflow-auto">
-                                {
-                                    orderItems.map(item => (
-                                        <div key={item.id + item.variant} className="flex gap-2 items-start shadow p-1 rounded mb-3">
-                                            <img className="w-9 h-9 rounded-full object-cover" src={item.image} alt={item.title} />
-                                            <div className="flex-1">
-                                                <p className="text-sm">{item.title}{item.variant !== '-' && ` - ${item.variant}`}</p>
-                                                <p className="text-xs text-gray-400">{item.unitPrice}DH</p>
-                                            </div>
-                                            <div className="flex gap-3 items-center">
-                                                <div className='flex gap-1 items-center'>
-                                                    <Button
-                                                        className='p-1'
-                                                        disabled={item.quantity == 1}
-                                                        variant='ghost'
-                                                        onClick={() => {
-                                                            setOrderItems(prevOrderItems =>
-                                                                prevOrderItems.map(orderItem =>
-                                                                    orderItem.id === item.id && orderItem.variant === item.variant
-                                                                        ? { ...orderItem, quantity: Math.max(orderItem.quantity - 1, 1) }
-                                                                        : orderItem
-                                                                )
-                                                            );
-                                                        }}
-                                                    >
-                                                        <Minus size={14} />
-                                                    </Button>
-                                                    <span className='text-xs text-gray-600'>{item.quantity}</span>
-                                                    <Button
-                                                        className='p-1'
-                                                        variant='ghost'
-                                                        onClick={() => {
-                                                            setOrderItems(prevOrderItems =>
-                                                                prevOrderItems.map(orderItem =>
-                                                                    orderItem.id === item.id && orderItem.variant === item.variant
-                                                                        ? { ...orderItem, quantity: orderItem.quantity + 1 }
-                                                                        : orderItem
-                                                                )
-                                                            );
-                                                        }}
-                                                    >
-                                                        <Plus size={14} />
-                                                    </Button>
-                                                </div>
+            </div>
+            <div className="w-full fixed bottom-0 border bg-white border-gray-200 right-0 left-0  flex items-center justify-end p-3 gap-3">
+                <Dialog>
+                    <DialogTrigger className='bg-green-50 text-green-800 px-2.5 py-1.5 rounded flex items-center gap-0.5'>
+                        <Eye size={16} /> View items
+                    </DialogTrigger>
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle>Order items</DialogTitle>
+                        </DialogHeader>
+                        <div className="h-56 overflow-auto">
+                            {
+                                orderItems.map(item => (
+                                    <div key={item.id + item.variant} className="flex gap-2 items-start shadow p-1 rounded mb-3">
+                                        <img className="w-9 h-9 rounded-full object-cover" src={item.image} alt={item.title} />
+                                        <div className="flex-1">
+                                            <p className="text-sm">{item.title}{item.variant !== '-' && ` - ${item.variant}`}</p>
+                                            <p className="text-xs text-gray-400">{item.unitPrice}DH</p>
+                                        </div>
+                                        <div className="flex gap-3 items-center">
+                                            <div className='flex gap-1 items-center'>
+                                                <Button
+                                                    className='p-1'
+                                                    disabled={item.quantity == 1}
+                                                    variant='ghost'
+                                                    onClick={() => {
+                                                        setOrderItems(prevOrderItems =>
+                                                            prevOrderItems.map(orderItem =>
+                                                                orderItem.id === item.id && orderItem.variant === item.variant
+                                                                    ? { ...orderItem, quantity: Math.max(orderItem.quantity - 1, 1) }
+                                                                    : orderItem
+                                                            )
+                                                        );
+                                                    }}
+                                                >
+                                                    <Minus size={14} />
+                                                </Button>
+                                                <span className='text-xs text-gray-600'>{item.quantity}</span>
                                                 <Button
                                                     className='p-1'
                                                     variant='ghost'
                                                     onClick={() => {
                                                         setOrderItems(prevOrderItems =>
-                                                            prevOrderItems.filter(orderItem =>
-                                                                !(orderItem.id === item.id && orderItem.variant === item.variant)
+                                                            prevOrderItems.map(orderItem =>
+                                                                orderItem.id === item.id && orderItem.variant === item.variant
+                                                                    ? { ...orderItem, quantity: orderItem.quantity + 1 }
+                                                                    : orderItem
                                                             )
                                                         );
                                                     }}
                                                 >
-                                                    <Trash2 color='red' size={14} />
+                                                    <Plus size={14} />
                                                 </Button>
                                             </div>
+                                            <Button
+                                                className='p-1'
+                                                variant='ghost'
+                                                onClick={() => {
+                                                    setOrderItems(prevOrderItems =>
+                                                        prevOrderItems.filter(orderItem =>
+                                                            !(orderItem.id === item.id && orderItem.variant === item.variant)
+                                                        )
+                                                    );
+                                                }}
+                                            >
+                                                <Trash2 color='red' size={14} />
+                                            </Button>
                                         </div>
-                                    ))
-                                }
-                            </div>
-                            <p className='w-fit ml-auto text-sm text-gray-500 font-medium'>Total: {calculateTotalPrice()}DH</p>
-                        </DialogContent>
-                    </Dialog>
-                    <Dialog>
-                        <DialogTrigger disabled={orderItems.length === 0} className={`bg-primary text-white px-2.5 py-1.5 rounded flex items-center gap-1 ${orderItems.length === 0 && 'opacity-60 cursor-not-allowed'}`}>
-                            <Save size={18} /> Save order
-                        </DialogTrigger>
-                        <DialogContent>
-                            <DialogHeader>
-                                <DialogTitle>Client info</DialogTitle>
-                            </DialogHeader>
-                            <div>
-                                <label>Full Name:</label>
-                                <CustomInput
-                                    type="text"
-                                    name="fullName"
-                                    value={newCustomerInfo.fullName}
-                                    onChange={handleNewCustomerInputChange}
-                                    required
-                                />
-                                {errors.fullName && <p className="text-red-500 text-sm">{errors.fullName}</p>}
-                            </div>
-                            <div>
-                                <label>Phone:</label>
-                                <CustomInput
-                                    type="text"
-                                    name="phone"
-                                    value={newCustomerInfo.phone}
-                                    onChange={handleNewCustomerInputChange}
-                                    required
-                                />
-                                {errors.phone && <p className="text-red-500 text-sm">{errors.phone}</p>}
-                            </div>
-                            <div>
-                                <label>Address:</label>
-                                <CustomInput
-                                    type="text"
-                                    name="address"
-                                    value={newCustomerInfo.address}
-                                    onChange={handleNewCustomerInputChange}
-                                    required
-                                />
-                                {errors.address && <p className="text-red-500 text-sm">{errors.address}</p>}
-                            </div>
-                            <Button onClick={handleSaveOrder}>Save</Button>
-                        </DialogContent>
-                    </Dialog>
-                </div>
+                                    </div>
+                                ))
+                            }
+                        </div>
+                        <p className='w-fit ml-auto text-sm text-gray-500 font-medium'>Total: {calculateTotalPrice()}DH</p>
+                    </DialogContent>
+                </Dialog>
+                <Dialog>
+                    <DialogTrigger disabled={orderItems.length === 0} className={`bg-primary text-white px-2.5 py-1.5 rounded flex items-center gap-1 ${orderItems.length === 0 && 'opacity-60 cursor-not-allowed'}`}>
+                        <Save size={18} /> Save order
+                    </DialogTrigger>
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle>Client info</DialogTitle>
+                        </DialogHeader>
+                        <div>
+                            <label>Full Name:</label>
+                            <CustomInput
+                                type="text"
+                                name="fullName"
+                                value={newCustomerInfo.fullName}
+                                onChange={handleNewCustomerInputChange}
+                                required
+                            />
+                            {errors.fullName && <p className="text-red-500 text-sm">{errors.fullName}</p>}
+                        </div>
+                        <div>
+                            <label>Phone:</label>
+                            <CustomInput
+                                type="text"
+                                name="phone"
+                                value={newCustomerInfo.phone}
+                                onChange={handleNewCustomerInputChange}
+                                required
+                            />
+                            {errors.phone && <p className="text-red-500 text-sm">{errors.phone}</p>}
+                        </div>
+                        <div>
+                            <label>Address:</label>
+                            <CustomInput
+                                type="text"
+                                name="address"
+                                value={newCustomerInfo.address}
+                                onChange={handleNewCustomerInputChange}
+                                required
+                            />
+                            {errors.address && <p className="text-red-500 text-sm">{errors.address}</p>}
+                        </div>
+                        <Button onClick={handleSaveOrder}>Save</Button>
+                    </DialogContent>
+                </Dialog>
             </div>
 
             <div className='mt-4 w-fit'>
