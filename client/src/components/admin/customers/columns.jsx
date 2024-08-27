@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { MoreHorizontal } from "lucide-react";
+import { MoreHorizontal, Pen, Trash2 } from "lucide-react";
 import { ArrowUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -141,12 +141,15 @@ const customerColumns = [
                         <DropdownMenuContent align="end">
                             <DropdownMenuLabel>Actions</DropdownMenuLabel>
                             <DropdownMenuItem>
-                                <DialogTrigger className='text-blue-600'>
-                                    Update
+                                <DialogTrigger className='flex items-center gap-1 text-blue-600'>
+                                    <Pen size={15} />Update
                                 </DialogTrigger>
                             </DropdownMenuItem>
-                            <DropdownMenuItem onClick={handleDelete} className='text-red-600'>
-                                Delete
+                            <DropdownMenuItem
+                                onClick={handleDelete}
+                                className='flex items-center gap-1 text-red-600'
+                            >
+                                <Trash2 size={15} /> Delete
                             </DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
@@ -197,13 +200,14 @@ const customerColumns = [
                                     <p className="text-red-500 text-sm">{validationErrors.address}</p>
                                 )}
                             </div>
-                            <div>
+                            <div className="flex items-center gap-2">
                                 <input
                                     type="checkbox"
                                     id="blacklist"
                                     name="inBlacklist"
                                     checked={guestInfo.inBlacklist}
                                     onChange={handleInputChange}
+                                    className="accent-primary"
                                 />
                                 <label htmlFor='blacklist'>Blacklisted</label>
                             </div>

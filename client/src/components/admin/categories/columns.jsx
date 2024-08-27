@@ -1,4 +1,4 @@
-import { MoreHorizontal } from "lucide-react"
+import { MoreHorizontal, Pen, Trash2 } from "lucide-react"
 import { ArrowUpDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
@@ -128,7 +128,9 @@ const categoryColumns = [
                     <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
                         <DropdownMenuItem className='text-blue-600'>
-                            <Link to={'/admin/categories/' + category._id}>Update</Link>
+                            <Link className="flex items-center gap-1" to={'/admin/categories/' + category._id}>
+                                <Pen size={15} /> Update
+                            </Link>
                         </DropdownMenuItem>
                         <DropdownMenuItem
                             onClick={async () => {
@@ -140,9 +142,9 @@ const categoryColumns = [
                                     }
                                 }
                             }}
-                            className='text-red-500'
+                            className='flex items-center gap-1 text-red-500'
                         >
-                            Delete
+                            <Trash2 size={15} /> Delete
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
