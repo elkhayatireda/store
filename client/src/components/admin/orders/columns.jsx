@@ -328,6 +328,11 @@ const orderColumns = [
                                         try {
                                             const response = await axiosClient.put('/orders/details/' + order._id, { items: orderItems, totalPrice: calculateTotalPrice() });
                                             toast.success('Order updated successfully');
+                                            setData(prevData => {
+                                                return prevData.map(item =>
+                                                    item._id === order._id ? { ...item, items: orderItems } : item
+                                                );
+                                            });
                                             console.log('Order updated successfully:', response.data);
                                         } catch (error) {
                                             toast.error('Error creating order');
