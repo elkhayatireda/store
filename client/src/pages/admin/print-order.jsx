@@ -29,7 +29,11 @@ const PrintOrder = () => {
             const printWindow = window.open('', '_blank');
             printWindow.document.write(`<img src="${imgData}" style="width:100%" />`);
             printWindow.document.close();
-            printWindow.print();
+
+            // Add this line to wait for the content to load before printing
+            printWindow.onload = () => {
+                printWindow.print();
+            };
         });
     };
 
