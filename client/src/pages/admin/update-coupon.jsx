@@ -134,7 +134,7 @@ export default function AddCoupon() {
     }
     try {
       const response = await axiosClient.post(`/coupons/update/${id}`, formDataToSend);
-      toast.success("Coupon created successfully");
+      toast.success("Coupon updated successfully");
 
       // Reset form after successful creation
       setFormData({

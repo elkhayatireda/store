@@ -7,6 +7,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import imageCompression from "browser-image-compression";
 import ProductSelect from "../../components/admin/reviews/product-select";
 import StarRating from "../../components/admin/reviews/start-rating";
+import { useDropzone } from 'react-dropzone';
 
 export default function AddProduct() {
   const navigate = useNavigate();
@@ -21,6 +22,45 @@ export default function AddProduct() {
   });
   const [products, setProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const handleDrop = async (acceptedFiles) => {
+    const newImages = [...formData.images];
+
+    for (let i = 0; i < acceptedFiles.length; i++) {
+      newImages.push(acceptedFiles[i]);
+    }
+
+    setIsLoading(true);
+    const formDataToSend = new FormData();
+    const compressedImages = await compressImages(newImages);
+    compressedImages.forEach((image, index) => {
+      formDataToSend.append("images", image);
+    });
+
+    try {
+      const response = await axiosClient.post(
+        "/products/upload-images",
+        formDataToSend,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      setIsLoading(false);
+      setFormData({
+        ...formData,
+        images: [...formData.images, ...response.data],
+      });
+    } catch (error) {
+      console.error(error);
+      toast.error("Something went wrong");
+    }
+};
+  const { getRootProps, getInputProps } = useDropzone({
+    onDrop: handleDrop,
+    accept: 'image/*',
+    maxSize: 5 * 1024 * 1024 // 5MB
+});
 
   const fetchProducts = async () => {
     try {
@@ -247,10 +287,11 @@ export default function AddProduct() {
             />
           </div>
         </div>
-        <div className="w-full">
+        <div className="w-full"  {...getRootProps({ className: 'dropzone' })}>
+        <input {...getInputProps()} />
           <label
             htmlFor="images"
-            className="w-full border-2 border-gray-200 rounded-xl p-5  flex flex-col items-center justify-center cursor-pointer"
+            className="w-full border-2 border-gray-200 rounded p-5  flex flex-col items-center justify-center cursor-pointer"
           >
             <div className="mb-1 text-black">
               <ImageUp size={40} />

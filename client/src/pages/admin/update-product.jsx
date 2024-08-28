@@ -8,6 +8,7 @@ import { ImageUp, X, Image, Trash, Save } from "lucide-react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import imageCompression from "browser-image-compression"; // Import the library
 import { undefined } from "zod";
+import { useDropzone } from 'react-dropzone';
 
 export default function AddProduct() {
   const navigate = useNavigate();
@@ -44,7 +45,45 @@ export default function AddProduct() {
   const [currentCombinationIndex, setCurrentCombinationIndex] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const { id } = useParams();
+  const handleDrop = async (acceptedFiles) => {
+    const newImages = [...formData.images];
 
+    for (let i = 0; i < acceptedFiles.length; i++) {
+      newImages.push(acceptedFiles[i]);
+    }
+
+    setIsLoading(true);
+    const formDataToSend = new FormData();
+    const compressedImages = await compressImages(newImages);
+    compressedImages.forEach((image, index) => {
+      formDataToSend.append("images", image);
+    });
+
+    try {
+      const response = await axiosClient.post(
+        "/products/upload-images",
+        formDataToSend,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      setIsLoading(false);
+      setFormData({
+        ...formData,
+        images: [...formData.images, ...response.data],
+      });
+    } catch (error) {
+      console.error(error);
+      toast.error("Something went wrong");
+    }
+  };
+  const { getRootProps, getInputProps } = useDropzone({
+    onDrop: handleDrop,
+    accept: "image/*",
+    maxSize: 5 * 1024 * 1024, // 5MB
+  });
   const fetchCategories = async () => {
     try {
       const response = await axiosClient.get("/categories/getAll");
@@ -483,7 +522,8 @@ export default function AddProduct() {
               </label>
               <ReactQuill theme="snow" value={value} onChange={setValue} />
             </div>
-            <div className="w-full">
+            <div className="w-full"  {...getRootProps({ className: 'dropzone' })}>
+        <input {...getInputProps()} />
               <label
                 htmlFor="images"
                 className="w-full border-2 border-gray-200 rounded-xl p-5 py-10 flex flex-col items-center justify-center cursor-pointer"

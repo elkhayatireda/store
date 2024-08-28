@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import Order from '../models/order.model.js';
 import Customer from '../models/customer.model.js';
-
+import orderEvents from "../events/orderEvents.js";
 // Create a new order
 export const createOrder = async (req, res) => {
     try {
@@ -43,10 +43,11 @@ export const createOrder = async (req, res) => {
             items,
             totalPrice,
             status: 'pending',
-            inBlacklist: customer.inBlacklist, // Use inBlacklist directly in the order
+            inBlacklist: customer.inBlacklist, 
         });
 
         await order.save();
+        orderEvents.emit('orderCreated', order);
         res.status(201).json({ message: 'Order created successfully', order });
     } catch (error) {
         res.status(500).json({ message: 'Error creating order', error: error.message });
@@ -97,6 +98,7 @@ export const updateOrderStatus = async (req, res) => {
 
             // Save the updated order
             const updatedOrder = await order.save();
+
             res.json(updatedOrder);
         } else {
             res.status(404).json({ message: 'Order not found' });

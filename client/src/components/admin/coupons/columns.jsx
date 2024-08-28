@@ -61,7 +61,34 @@ const couponColumns = [
   },
   {
     accessorKey: "expirationDate",
-    header: "expiration Date",
+    header: ({ column }) => {
+      return (
+        <Button
+          className="p-0"
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Expiration date
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
+    cell: ({ row }) => {
+      const date = new Date(row.original.expirationDate);
+      const options = {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: false,
+      };
+      const formattedDate = date
+        .toLocaleString("fr-FR", options)
+        .replace(",", "");
+      return <div>{formattedDate}</div>;
+    },
   },
   {
     accessorKey: "status",
@@ -70,10 +97,10 @@ const couponColumns = [
       const coupon = row.original;
       const { changeStatus } = useCoupons();
       return (
-        <div  className="flex items-center justify-start "  onClick={()=>{changeStatus(coupon._id)}}>
+        <div  className="flex items-center justify-start "  >
            <label
                   className="inline-flex items-center cursor-pointer outline-none"
-                  htmlFor="isVariant"
+                  htmlFor={row.original._id}
                 >
                   <input
                     type="checkbox"
@@ -81,7 +108,7 @@ const couponColumns = [
                     id={row.original._id}
                     value={row.original.isActive}
                     checked={row.original.isActive}
-                   
+                    onChange={()=>{changeStatus(coupon._id)}}
                   />
                   <div className="relative w-11 h-6 bg-gray-200 rounded-full peer  peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-green-500"></div>
                 </label>

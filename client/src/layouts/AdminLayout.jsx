@@ -2,7 +2,7 @@ import { Outlet } from "react-router-dom";
 import SideBar, { SidebarItem } from "@/components/admin/sideBar";
 import {
     MessageSquareText  ,
-    MessageSquare ,
+    Settings ,
     Users,
     BarChart,
     ShoppingCart ,
@@ -33,6 +33,7 @@ function AdminLayout() {
                 <SidebarItem icon={<MessageSquareText    size={21} />} text={'Reviews'} location={"/admin/reviews"} />
                 <SidebarItem icon={<Tag  size={21} />} text={'Coupons'} location={"/admin/coupons"} />
                 <SidebarItem icon={<Users size={21} />} text={'Customers'} location={"/admin/customers"} />
+                <SidebarItem icon={<Settings size={21} />} text={'Settings'} location={"/admin/settings"} />
             </SideBar>
             <main
                 className="transition-all duration-300 pb-4 pr-3"

@@ -4,9 +4,10 @@ import { toast } from "react-toastify";
 import { authContext } from "../../contexts/AuthWrapper";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
-import { ImageUp, X, Image, Trash, ChevronLeft, Save  } from "lucide-react";
+import { ImageUp, X, Image, Trash, ChevronLeft, Save } from "lucide-react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import imageCompression from "browser-image-compression"; // Import the library
+import { useDropzone } from "react-dropzone";
 
 export default function AddProduct() {
   const navigate = useNavigate();
@@ -31,7 +32,45 @@ export default function AddProduct() {
   const [categories, setCategories] = useState([]);
   const [currentCombinationIndex, setCurrentCombinationIndex] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const handleDrop = async (acceptedFiles) => {
+    const newImages = [...formData.images];
 
+    for (let i = 0; i < acceptedFiles.length; i++) {
+      newImages.push(acceptedFiles[i]);
+    }
+
+    setIsLoading(true);
+    const formDataToSend = new FormData();
+    const compressedImages = await compressImages(newImages);
+    compressedImages.forEach((image, index) => {
+      formDataToSend.append("images", image);
+    });
+
+    try {
+      const response = await axiosClient.post(
+        "/products/upload-images",
+        formDataToSend,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      setIsLoading(false);
+      setFormData({
+        ...formData,
+        images: [...formData.images, ...response.data],
+      });
+    } catch (error) {
+      console.error(error);
+      toast.error("Something went wrong");
+    }
+  };
+  const { getRootProps, getInputProps } = useDropzone({
+    onDrop: handleDrop,
+    accept: "image/*",
+    maxSize: 5 * 1024 * 1024, // 5MB
+  });
   const fetchCategories = async () => {
     try {
       const response = await axiosClient.get("/categories/getAll");
@@ -254,7 +293,7 @@ export default function AddProduct() {
           onClick={handleUpdate}
           className="py-2 px-5 rounded-sm bg-green-500 mr-5 flex items-center justify-center gap-2 cursor-pointer "
         >
-         <Save  color="white" /> <p className="text-white text-lg">save</p>
+          <Save color="white" /> <p className="text-white text-lg">save</p>
         </button>
       </div>
       {isLoading && (
@@ -265,11 +304,11 @@ export default function AddProduct() {
       <div className="w-full flex items-center justify-between mb-10">
         <h4 className="text-4xl font-semibold text-[#141414]">New Product</h4>
         <Link
-                className='flex items-center gap-0.5 text-blue-500'
-                to={'/admin/products'}
-            >
-                <ChevronLeft size={18} /> Back
-            </Link>
+          className="flex items-center gap-0.5 text-blue-500"
+          to={"/admin/products"}
+        >
+          <ChevronLeft size={18} /> Back
+        </Link>
       </div>
       <div>
         <div className="flex gap-10 pb-32 w-full items-start justify-center ">
@@ -293,7 +332,11 @@ export default function AddProduct() {
                 ref={quillRef} // Attach the ref to ReactQuill
               />
             </div>
-            <div className="w-full">
+            <div
+              className="w-full"
+              {...getRootProps({ className: "dropzone" })}
+            >
+              <input {...getInputProps()} />
               <label
                 htmlFor="images"
                 className="w-full border-2 border-gray-200 rounded-xl p-5 py-10 flex flex-col items-center justify-center cursor-pointer"

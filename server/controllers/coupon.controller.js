@@ -14,6 +14,12 @@ export const createCoupon = async (req, res) => {
       active,
       maxUsage,
     } = req.body;
+
+    const existingCoupon = await Coupon.findOne({ code: Code });
+    if (existingCoupon) {
+      return res.status(400).json({ message: "Coupon code already exists" });
+    }
+
     let selectedProducts = [];
     if (allProduct) {
       selectedProducts = JSON.parse(req.body.selectedProducts);
@@ -111,14 +117,20 @@ export const updateCoupon = async (req, res) => {
       active,
       maxUsage,
     } = req.body;
-    let selectedProducts = [];
-    if (allProduct == "false") {
-      selectedProducts = JSON.parse(req.body.selectedProducts);
+
+    const existingCoupon = await Coupon.findOne({ code: Code });
+    if (existingCoupon) {
+      return res.status(400).json({ message: "Coupon code already exists" });
     }
     const coupon = await Coupon.findById(req.params.id);
     if (!coupon) {
       return res.status(404).json({ message: "coupon not found" });
     }
+    let selectedProducts = [];
+    if (allProduct == "false") {
+      selectedProducts = JSON.parse(req.body.selectedProducts);
+    }
+    
 
     coupon.code = Code || coupon.code;
     coupon.discountType = selectedDiscountType || coupon.discountType;
@@ -129,6 +141,7 @@ export const updateCoupon = async (req, res) => {
     coupon.isActive = active || coupon.isActive;
     coupon.maxUsage = maxUsage || coupon.maxUsage;
     if (allProduct == "false") {
+      console.log("dddddd1")
       coupon.productIds = selectedProducts;
     }else{
         coupon.productIds = [];

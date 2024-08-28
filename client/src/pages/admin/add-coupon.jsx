@@ -43,6 +43,7 @@ export default function AddCoupon() {
     try {
       const response = await axiosClient.get("/products");
       setProducts(response.data);
+      setFilteredProducts(response.data);
       console.log(response.data);
     } catch (error) {
       console.error(error);
@@ -93,7 +94,7 @@ export default function AddCoupon() {
     formDataToSend.append("allProduct", formData.allProduct);
     formDataToSend.append("active", formData.active);
     formDataToSend.append("maxUsage", formData.maxUsage);
-    if (formData.allProduct) {
+    if (!formData.allProduct) {
       formDataToSend.append(
         "selectedProducts",
         JSON.stringify(formData.selectedProducts)
@@ -101,6 +102,8 @@ export default function AddCoupon() {
     }
 
     try {
+      console.log(formData.allProduct)
+      console.log(formData.selectedProducts)
       const response = await axiosClient.post(`/coupons`, formDataToSend);
       toast.success("Coupon created successfully");
 
