@@ -1,4 +1,4 @@
-import { MoreHorizontal } from "lucide-react"
+import { MoreHorizontal, Pen, Trash2 } from "lucide-react"
 import { ArrowUpDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
@@ -95,12 +95,20 @@ const categoryColumns = [
             )
         },
         cell: ({ row }) => {
-            const date = new Date(row.original.createdAt)
-            const options = { year: 'numeric', month: 'long', day: 'numeric' };
-            const formattedDate = date.toLocaleDateString('fr-FR', options);
-            return <div>
-                {formattedDate}
-            </div>
+            const date = new Date(row.original.createdAt);
+
+            // Extract components from the date
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-based, so add 1
+            const day = String(date.getDate()).padStart(2, '0');
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            const seconds = String(date.getSeconds()).padStart(2, '0');
+
+            // Format date as y-m-d h:m:s
+            const formattedDate = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+
+            return <div>{formattedDate}</div>;
         }
     },
     {
@@ -120,7 +128,9 @@ const categoryColumns = [
                     <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
                         <DropdownMenuItem className='text-blue-600'>
-                            <Link to={'/admin/categories/' + category._id}>Update</Link>
+                            <Link className="flex items-center gap-1" to={'/admin/categories/' + category._id}>
+                                <Pen size={15} /> Update
+                            </Link>
                         </DropdownMenuItem>
                         <DropdownMenuItem
                             onClick={async () => {
@@ -132,9 +142,9 @@ const categoryColumns = [
                                     }
                                 }
                             }}
-                            className='text-red-500'
+                            className='flex items-center gap-1 text-red-500'
                         >
-                            Delete
+                            <Trash2 size={15} /> Delete
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>

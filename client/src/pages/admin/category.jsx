@@ -4,7 +4,7 @@ import imageCompression from 'browser-image-compression'; // Import the library
 import { axiosClient } from '@/api/axios';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { ChevronLeft, CloudUpload } from 'lucide-react';
+import { ChevronLeft, CloudUpload, Save } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import CustomInput from '@/components/custom/CustomInput';
 import CustomTextInput from '@/components/custom/CustomTextInput';
@@ -134,15 +134,17 @@ const CategoryForm = () => {
 
     return (
         <div>
-            <Link
-                className='flex items-center gap-0.5 text-blue-500'
-                to={'/admin/categories'}
-            >
-                <ChevronLeft size={18} /> Back
-            </Link>
-            <h2 className='text-xl font-semibold'>
-                {id !== 'create' ? `Edit ${title} Category` : 'Create a new category'}
-            </h2>
+            <div className='flex flex-col-reverse sm:flex-row items-start sm:items-center justify-between gap-2'>
+                <h2 className='text-xl font-semibold'>
+                    {id !== 'create' ? `Edit ${title} Category` : 'Create a new category'}
+                </h2>
+                <Link
+                    className='flex items-center gap-0.5 text-blue-500'
+                    to={'/admin/categories'}
+                >
+                    <ChevronLeft size={18} /> Back
+                </Link>
+            </div>
 
             <form className='mt-7' onSubmit={handleSubmit}>
                 <div className='w-full flex flex-col sm:flex-row justify-center items-center gap-8'>
@@ -194,13 +196,13 @@ const CategoryForm = () => {
                         </div>
                     </div>
                 </div>
-                <div className='mt-5 flex justify-end'>
+                <div className="w-full fixed bottom-0 border bg-white border-gray-200 right-0 left-0  flex items-center justify-end p-3">
                     <Button
-                        className='bg-primary text-white'
                         type="submit"
                         disabled={loading}
+                        className='bg-primary text-white flex gap-1'
                     >
-                        {id !== 'create' ? 'Update' : 'Create'}
+                        <Save size={18} /> <span className="text-white">{id !== 'create' ? 'Update' : 'Create'}</span>
                     </Button>
                 </div>
             </form>

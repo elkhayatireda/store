@@ -32,6 +32,7 @@ import Coupons from '@/pages/admin/coupons';
 import Settings from '@/pages/admin/settings';
 import { ReviewsProvider } from '@/contexts/review';
 import { CouponsProvider } from '@/contexts/coupon';
+import PrintOrder from '@/pages/admin/print-order';
 // router
 export const router = createBrowserRouter([
     {
@@ -73,6 +74,10 @@ export const router = createBrowserRouter([
             {
                 path: "/admin/orders",
                 element: <OrdersProvider><Orders /></OrdersProvider>
+            },
+            {
+                path: "/admin/print/:id",
+                element: <PrintOrder />
             },
             {
                 path: "/admin/reviews",

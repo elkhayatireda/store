@@ -1,4 +1,4 @@
-import { MoreHorizontal } from "lucide-react"
+import { Edit, Eye, MoreHorizontal, Pen, Printer, Settings2 } from "lucide-react"
 import { ArrowUpDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
@@ -22,6 +22,7 @@ import { useOrders } from "@/contexts/order"
 import { DialogDescription } from "@radix-ui/react-dialog"
 import { useState } from "react"
 import { axiosClient } from "@/api/axios"
+import { Plus, Minus, Trash2 } from 'lucide-react';
 
 const orderColumns = [
     {
@@ -47,8 +48,13 @@ const orderColumns = [
         enableHiding: false,
     },
     {
-        accessorKey: "ref",
+        id: "ref",
         header: "Ref",
+        cell: ({ row }) => {
+            return <span className='text-blue-700'>
+                #0{row.original.ref}
+            </span>
+        },
     },
     {
         id: 'customer',
@@ -156,6 +162,8 @@ const orderColumns = [
             const [status, setStatus] = useState(row.original.status);
             const [isDetailsOpen, setIsDetailsOpen] = useState(false)
             const [isStatusOpen, setIsStatusOpen] = useState(false)
+            const [isUpdateOpen, setIsUpdateOpen] = useState(false)
+            const [orderItems, setOrderItems] = useState(order.items);
             const { deleteOrder, setData } = useOrders()
 
             const handleStatusChange = (e) => {
@@ -182,6 +190,11 @@ const orderColumns = [
                     toast.error("Failed to update status");
                 }
             };
+
+            const calculateTotalPrice = () => {
+                return orderItems.reduce((total, item) => total + item.unitPrice * item.quantity, 0);
+            };
+
             return (
                 <>
                     <DropdownMenu>
@@ -193,12 +206,25 @@ const orderColumns = [
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                            <DropdownMenuItem onClick={() => setIsDetailsOpen(true)}>View details</DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => setIsStatusOpen(true)}>Edit status</DropdownMenuItem>
-                            <DropdownMenuItem className='text-blue-600'>
-                                <Link to={'/admin/orders/' + order._id}>Update order</Link>
+                            <DropdownMenuItem className='cursor-pointer flex items-center gap-1' onClick={() => setIsDetailsOpen(true)}>
+                                <Eye size={15} />View details
+                            </DropdownMenuItem>
+                            <DropdownMenuItem className='cursor-pointer flex items-center gap-1' onClick={() => setIsStatusOpen(true)}>
+                                <Settings2 size={15} />Edit status
+                            </DropdownMenuItem>
+                            <DropdownMenuItem>
+                                <Link className='flex items-center gap-1' to={'/admin/print/' + order._id}>
+                                    <Printer size={15} /> Print order
+                                </Link>
                             </DropdownMenuItem>
                             <DropdownMenuItem
+                                className='cursor-pointer flex items-center gap-1 text-blue-600'
+                                onClick={() => setIsUpdateOpen(true)}
+                            >
+                                <Pen size={15} />Edit order
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                                className='cursor-pointer flex items-center gap-1 text-red-500'
                                 onClick={async () => {
                                     if (window.confirm('Are you sure you want to delete this order?')) {
                                         try {
@@ -208,15 +234,119 @@ const orderColumns = [
                                         }
                                     }
                                 }}
-                                className='text-red-500'
                             >
-                                Delete
+                                <Trash2 size={15} />Delete
                             </DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
+                    <Dialog open={isUpdateOpen}
+                        onOpenChange={setIsUpdateOpen}>
+                        <DialogContent>
+                            <DialogHeader>
+                                <DialogTitle>Order update</DialogTitle>
+                            </DialogHeader>
+                            <div className="text-sm text-gray-600 font-light">
+                                <p><span className="text-gray-700 font-medium">Customer:</span> {order.guestInfo.fullName}</p>
+                                <p><span className="text-gray-700 font-medium">Phone number:</span> {order.guestInfo.phone}</p>
+                                <p><span className="text-gray-700 font-medium">Address:</span> {order.guestInfo.address}</p>
+                            </div>
+                            <div className="h-60 overflow-auto">
+                                {
+                                    orderItems.map(item => (
+                                        <div key={item.id + item.variant} className="flex gap-2 items-start border p-1.5 rounded mb-3">
+                                            <img className="w-9 h-9 rounded-full object-cover" src={item.image} alt={item.title} />
+                                            <div className="flex-1">
+                                                <p className="text-sm">{item.title}{item.variant !== '-' && ` - ${item.variant}`}</p>
+                                                <p className="text-xs text-gray-400">{item.unitPrice}DH</p>
+                                            </div>
+                                            <div className="flex gap-3 items-center">
+                                                <div className='flex gap-1 items-center'>
+                                                    <Button
+                                                        className='p-1'
+                                                        disabled={item.quantity == 1}
+                                                        variant='ghost'
+                                                        onClick={() => {
+                                                            setOrderItems(prevOrderItems =>
+                                                                prevOrderItems.map(orderItem =>
+                                                                    orderItem.id === item.id && orderItem.variant === item.variant
+                                                                        ? { ...orderItem, quantity: Math.max(orderItem.quantity - 1, 1) }
+                                                                        : orderItem
+                                                                )
+                                                            );
+                                                        }}
+                                                    >
+                                                        <Minus size={14} />
+                                                    </Button>
+                                                    <span className='text-xs text-gray-600'>{item.quantity}</span>
+                                                    <Button
+                                                        className='p-1'
+                                                        variant='ghost'
+                                                        onClick={() => {
+                                                            setOrderItems(prevOrderItems =>
+                                                                prevOrderItems.map(orderItem =>
+                                                                    orderItem.id === item.id && orderItem.variant === item.variant
+                                                                        ? { ...orderItem, quantity: orderItem.quantity + 1 }
+                                                                        : orderItem
+                                                                )
+                                                            );
+                                                        }}
+                                                    >
+                                                        <Plus size={14} />
+                                                    </Button>
+                                                </div>
+                                                <Button
+                                                    className='p-1'
+                                                    variant='ghost'
+                                                    onClick={() => {
+                                                        setOrderItems(prevOrderItems =>
+                                                            prevOrderItems.filter(orderItem =>
+                                                                !(orderItem.id === item.id && orderItem.variant === item.variant)
+                                                            )
+                                                        );
+                                                    }}
+                                                >
+                                                    <Trash2 color='red' size={14} />
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    ))
+                                }
+                            </div>
+                            <p className="text-xs text-gray-600">
+                                To update customer's information or add more items, click "Update Order".
+                                To save the changes made to the items, click "Save Changes".
+                            </p>
+                            <div className="flex justify-end gap-2 items-center">
+                                <Link
+                                    className="text-blue-500 border border-blue-500 rounded px-3 py-2 hover:opacity-85"
+                                    to={'/admin/orders/' + order._id}
+                                >
+                                    Update order
+                                </Link>
+                                <Button
+                                    onClick={async () => {
+                                        try {
+                                            const response = await axiosClient.put('/orders/details/' + order._id, { items: orderItems, totalPrice: calculateTotalPrice() });
+                                            toast.success('Order updated successfully');
+                                            setData(prevData => {
+                                                return prevData.map(item =>
+                                                    item._id === order._id ? { ...item, items: orderItems } : item
+                                                );
+                                            });
+                                            console.log('Order updated successfully:', response.data);
+                                        } catch (error) {
+                                            toast.error('Error creating order');
+                                            console.error('Error creating order:', error);
+                                        }
+                                    }}
+                                >
+                                    Save Changes
+                                </Button>
+                            </div>
+                        </DialogContent>
+                    </Dialog>
                     <Dialog open={isDetailsOpen}
-                        onOpenChange={isDetailsOpen ?
-                            setIsDetailsOpen : setIsStatusOpen}>
+                        onOpenChange={setIsDetailsOpen}>
                         <DialogContent>
                             <DialogHeader>
                                 <DialogTitle>Order info</DialogTitle>
@@ -246,8 +376,7 @@ const orderColumns = [
                         </DialogContent>
                     </Dialog>
                     <Dialog open={isStatusOpen}
-                        onOpenChange={isStatusOpen ?
-                            setIsStatusOpen : setIsDetailsOpen}>
+                        onOpenChange={setIsStatusOpen}>
                         <DialogContent>
                             <DialogHeader>
                                 <DialogTitle>Order status</DialogTitle>
