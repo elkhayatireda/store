@@ -4,7 +4,7 @@ import {
 
 // layouts 
 import AdminLayout from '../layouts/AdminLayout';
-import HostLayout from '../layouts/HostLayout';
+import HostLayout from '../layouts/GuestLayout';
 
 // protectors 
 import AdminAuthRoute from './protectors/AdminAuthRoute';
@@ -33,6 +33,9 @@ import Settings from '@/pages/admin/settings';
 import { ReviewsProvider } from '@/contexts/review';
 import { CouponsProvider } from '@/contexts/coupon';
 import PrintOrder from '@/pages/admin/print-order';
+import Home from '@/pages/ecommerceM/home';
+import GuestLayout from '../layouts/GuestLayout';
+import ProductPage from '@/pages/ecommerceM/product-page';
 // router
 export const router = createBrowserRouter([
     {
@@ -115,6 +118,22 @@ export const router = createBrowserRouter([
                 path: "/admin/settings",
                 element: <Settings />
             },
+        ]
+    },
+    // ********************************************************************
+    // mostapha 
+    {
+        path: "/m",
+        element: <GuestLayout />,
+        children: [
+            {
+                path: '',
+                element: <Home />
+            },
+            {
+                path: 'products/:id',
+                element: <ProductPage />
+            }
         ]
     },
     {

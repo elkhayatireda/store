@@ -28,7 +28,7 @@ export const createProduct = async (req, res) => {
     }));
 
     const url = await generateSlug(title);
-    
+
     let category = await Category.findById(categoryId);
     let newProduct = new Product({
       categoryId: category,
@@ -94,30 +94,30 @@ const generateSlug = async (title) => {
 export const getProducts = async (req, res) => {
   try {
     const products = await Product.find()
-    .populate('categoryId', '_id title') // Populate categoryId with _id and title fields
-    .select('categoryId title price images visible createdAt'); // Select only the desired fields
+      .populate('categoryId', '_id title') // Populate categoryId with _id and title fields
+      .select('categoryId title price images visible createdAt'); // Select only the desired fields
 
-  // Count orders for each product
-  const productsWithOrderCount = await Promise.all(
-    products.map(async (product) => {
-      // Use aggregation to count the total quantity of the product in all orders
-      const orderCount = await Order.aggregate([
-        { $unwind: "$items" }, // Deconstruct the items array
-        { $match: { "items.id": product._id.toString() } }, // Match the product ID in items array
-        { $group: { _id: "$items.id", totalQuantity: { $sum: "$items.quantity" } } } // Sum the quantity of this product
-      ]);
+    // Count orders for each product
+    const productsWithOrderCount = await Promise.all(
+      products.map(async (product) => {
+        // Use aggregation to count the total quantity of the product in all orders
+        const orderCount = await Order.aggregate([
+          { $unwind: "$items" }, // Deconstruct the items array
+          { $match: { "items.id": product._id.toString() } }, // Match the product ID in items array
+          { $group: { _id: "$items.id", totalQuantity: { $sum: "$items.quantity" } } } // Sum the quantity of this product
+        ]);
 
-      // If the product is found in orders, retrieve the total quantity
-      const count = orderCount.length > 0 ? orderCount[0].totalQuantity : 0;
+        // If the product is found in orders, retrieve the total quantity
+        const count = orderCount.length > 0 ? orderCount[0].totalQuantity : 0;
 
-      return {
-        ...product.toObject(),
-        orderCount: count,
-      };
-    })
-  );
+        return {
+          ...product.toObject(),
+          orderCount: count,
+        };
+      })
+    );
 
-  res.status(200).json(productsWithOrderCount);
+    res.status(200).json(productsWithOrderCount);
   } catch (error) {
     console.error("Error fetching products:", error);
     res.status(500).json({ message: "Internal server error" });
@@ -131,7 +131,7 @@ export const getProduct = async (req, res) => {
     if (!product) {
       return res.status(404).json({ message: "Product not found" });
     }
-    
+
     res.status(200).json(product);
   } catch (error) {
     console.error("Error fetching product:", error);
@@ -246,26 +246,26 @@ export const getvariants = async (req, res) => {
     const { id } = req.params;
     const variants = await Variant.find({ product: id }).lean();
     if (!variants) {
-        return res.status(404).json({ message: 'Variants not found' });
+      return res.status(404).json({ message: 'Variants not found' });
     }
     res.status(200).json(variants);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Failed to fetch variants' });
-    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Failed to fetch variants' });
+  }
 };
 export const getCombinations = async (req, res) => {
   try {
-    const { id } = req.params; 
+    const { id } = req.params;
     const combinations = await Combination.find({ product: id }).lean();
     if (!combinations) {
-        return res.status(404).json({ message: 'Combinations not found' });
+      return res.status(404).json({ message: 'Combinations not found' });
     }
-    res.status(200).json(combinations); 
-} catch (error) {
+    res.status(200).json(combinations);
+  } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Failed to fetch combinations' });
-}
+  }
 };
 
 
@@ -273,10 +273,10 @@ export const uploadImages = async (req, res) => {
   try {
     const imageFiles = req.files;
     const images = await Promise.all(imageFiles.map(async (imageFile, index) => {
-      const imagePath = imageFile.path; 
+      const imagePath = imageFile.path;
       return imagePath;
     }));
-  
+
     res.status(201).json(images);
   } catch (error) {
     console.error(error);
@@ -299,38 +299,38 @@ export const updateImages = async (req, res) => {
   try {
     const images = req.body.images;
     const productId = req.params.id;
-      const product = await Product.findById(productId);
-      if (!product) {
-        return res.status(404).json({ message: 'Product not found' });
-      }
-      console.log(images)
-      product.images = images; 
-      console.log(product.images)
-      await product.save();
-      await Promise.all(
-        product.images.map(async (image) => {
-          const combinations = await Combination.find({ product: product._id });
-      
-          if (combinations.length === 0) {
-            res.status(200).json({ message: 'Images deleted successfully' });
+    const product = await Product.findById(productId);
+    if (!product) {
+      return res.status(404).json({ message: 'Product not found' });
+    }
+    console.log(images)
+    product.images = images;
+    console.log(product.images)
+    await product.save();
+    await Promise.all(
+      product.images.map(async (image) => {
+        const combinations = await Combination.find({ product: product._id });
 
-          }
-      
-          return Promise.all(
-            combinations.map(async (combination) => {
-              if (!images.includes(combination.image)) {
-                console.log('jkkkdf')
-                return Combination.findOneAndUpdate(
-                  { _id: combination._id },
-                  { image: '' },
-                  { new: true }
-                );
-              }
-            })
-          );
-        })
-      );
-      
+        if (combinations.length === 0) {
+          res.status(200).json({ message: 'Images deleted successfully' });
+
+        }
+
+        return Promise.all(
+          combinations.map(async (combination) => {
+            if (!images.includes(combination.image)) {
+              console.log('jkkkdf')
+              return Combination.findOneAndUpdate(
+                { _id: combination._id },
+                { image: '' },
+                { new: true }
+              );
+            }
+          })
+        );
+      })
+    );
+
     res.status(200).json({ message: 'Images deleted successfully' });
   } catch (error) {
     console.error('Failed to delete images:', error);
@@ -340,19 +340,19 @@ export const updateImages = async (req, res) => {
 
 
 export const updateProduct = async (req, res) => {
-  try{
-    const { 
-      categoryId, 
-      title, 
-      description, 
-      isVariant, 
+  try {
+    const {
+      categoryId,
+      title,
+      description,
+      isVariant,
       comparePrice,
       price,
       differentPrice,
       visible,
-      imagesChanged, 
-      variantsChanged, 
-      combImage, 
+      imagesChanged,
+      variantsChanged,
+      combImage,
       combination,
     } = req.body;
     const productId = req.params.id;
@@ -367,15 +367,15 @@ export const updateProduct = async (req, res) => {
       categoryId,
       comparePrice: comparePrice,
     };
-    console.log("variant ",isVariant)
+    console.log("variant ", isVariant)
     const updatedProduct = await Product.findOneAndUpdate({ _id: productId }, updatedData, { new: true });
-    if(variantsChanged == 'true'){
-      const  parsedVariants =  JSON.parse(req.body.variants);
+    if (variantsChanged == 'true') {
+      const parsedVariants = JSON.parse(req.body.variants);
       await Variant.deleteMany({ product: productId });
       await Combination.deleteMany({ product: productId });
       if (parsedVariants.length > 0) {
         console.log('yesdd');
-        const  parsedCombinations =  JSON.parse(req.body.combinations);
+        const parsedCombinations = JSON.parse(req.body.combinations);
         const variantDocs = await Promise.all(parsedVariants.map(variant => {
           const newVariant = new Variant({
             product: productId,
@@ -384,7 +384,7 @@ export const updateProduct = async (req, res) => {
           });
           return newVariant.save();
         }));
-           console.log('l3ew')
+        console.log('l3ew')
         // Create new combinations
         const combinationDocs = await Promise.all(parsedCombinations.map(combination => {
           const variantValues = variantDocs.map(variantDoc => variantDoc._id);
@@ -395,32 +395,56 @@ export const updateProduct = async (req, res) => {
             product: productId,
             combination: combination.combination,
             variantValues: combination.variantIndices,
-            price: combination.price, 
+            price: combination.price,
             comparePrice: combination.comparePrice,
-            image: combination.img, 
+            image: combination.img,
           });
           return newCombination.save();
         }));
-    } 
-    
-  } else if(combination == 'true') {
-    console.log('yesssss');
-    const  combinations =  JSON.parse(req.body.combinations);
-    await Promise.all(combinations.map(async combination => {
-      return Combination.findByIdAndUpdate(combination._id, { price: combination.price,comparePrice: combination.comparePrice  }, { new: true });
-    }));
-  } else if(combImage == 'true') {
-    console.log('yes');
-    const  combinations =  JSON.parse(req.body.combinations);
-    await Promise.all(combinations.map(async combination => {
-      return Combination.findByIdAndUpdate(combination._id, { image: combination.img   }, { new: true });
-    }));
-  }
-  console.log(combImage)
-  res.status(200).json({ message: 'Product updated successfully' });
+      }
 
-} catch (error) {
-  console.error('Error updating product:', error);
-  res.status(500).json({ message: 'Error updating product' });
-}
+    } else if (combination == 'true') {
+      console.log('yesssss');
+      const combinations = JSON.parse(req.body.combinations);
+      await Promise.all(combinations.map(async combination => {
+        return Combination.findByIdAndUpdate(combination._id, { price: combination.price, comparePrice: combination.comparePrice }, { new: true });
+      }));
+    } else if (combImage == 'true') {
+      console.log('yes');
+      const combinations = JSON.parse(req.body.combinations);
+      await Promise.all(combinations.map(async combination => {
+        return Combination.findByIdAndUpdate(combination._id, { image: combination.img }, { new: true });
+      }));
+    }
+    console.log(combImage)
+    res.status(200).json({ message: 'Product updated successfully' });
+
+  } catch (error) {
+    console.error('Error updating product:', error);
+    res.status(500).json({ message: 'Error updating product' });
+  }
+};
+
+export const getTopProducts = async (req, res) => {
+  try {
+    // Step 1: Aggregate order items to get the count of each product ID
+    const productCounts = await Order.aggregate([
+      { $unwind: "$items" }, // Unwind the items array to get individual products
+      { $group: { _id: "$items.id", count: { $sum: "$items.quantity" } } }, // Group by product ID and sum the quantities
+      { $sort: { count: -1 } }, // Sort by count in descending order
+      { $limit: 6 } // Limit to top 6 products
+    ]);
+
+    // Step 2: Extract product IDs from the aggregation result
+    const topProductIds = productCounts.map(item => item._id);
+
+    // Step 3: Find complete product details for the top products
+    const topProducts = await Product.find({ _id: { $in: topProductIds } });
+
+    // Return the top products
+    res.status(200).json(topProducts);
+  } catch (error) {
+    console.error("Error fetching top products:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
 };

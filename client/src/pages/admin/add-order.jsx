@@ -337,22 +337,26 @@ const AddOrder = () => {
                                     </DialogHeader>
 
                                     {product.isVariant && product.combinations.length > 0 ? (
-                                        product.combinations.map(variation => (
-                                            <div key={variation._id} className="flex items-center gap-2 mb-2">
-                                                <input
-                                                    type="radio"
-                                                    name="combination"
-                                                    id={variation._id}
-                                                    value={variation.combination}
-                                                    checked={selectedCombination && selectedCombination._id === variation._id}
-                                                    onChange={() => setSelectedCombination(variation)}
-                                                />
-                                                <label htmlFor={variation._id} className="flex gap-2 items-center">
-                                                    <img className='w-7 h-7 rounded-full object-cover' src={variation.image || product.images[0]} alt={variation.combination} />
-                                                    <span>{variation.combination} ({variation.price}DH)</span>
-                                                </label>
-                                            </div>
-                                        ))
+                                        <div className='max-h-56 overflow-auto'>
+                                            {
+                                            product.combinations.map(variation => (
+                                                <div key={variation._id} className="flex items-center gap-2 mb-2">
+                                                    <input
+                                                        type="radio"
+                                                        name="combination"
+                                                        id={variation._id}
+                                                        value={variation.combination}
+                                                        checked={selectedCombination && selectedCombination._id === variation._id}
+                                                        onChange={() => setSelectedCombination(variation)}
+                                                    />
+                                                    <label htmlFor={variation._id} className="flex gap-2 items-center">
+                                                        <img className='w-7 h-7 rounded-full object-cover' src={variation.image || product.images[0]} alt={variation.combination} />
+                                                        <span>{variation.combination} ({variation.price}DH)</span>
+                                                    </label>
+                                                </div>
+                                            ))
+                                            }
+                                        </div>
                                     ) : (
                                         <p className="text-sm text-gray-500">No variants available</p>
                                     )}

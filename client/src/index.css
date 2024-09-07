@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 * {
-  font-family: "Poppins", sans-serif;
+  font-family: "Plus Jakarta Sans", sans-serif;
 }
 
 :root {
@@ -78,8 +78,7 @@
 
 
 *::-webkit-scrollbar {
-  width: 6px;
-  height: 5px;
+  width: 5px;
 }
 
 *::-webkit-scrollbar-track {
@@ -87,8 +86,7 @@
 }
 
 *::-webkit-scrollbar-thumb {
-  background-color: #082f57;
-  border-radius: 10px;
+  background-color: #4a4a4a;
 }
 
 input:-webkit-autofill,
