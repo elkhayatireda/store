@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { MinusIcon, PlusIcon, StarIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import { toast } from "react-toastify";
 
 function ProductPage() {
     const { id } = useParams();
@@ -181,6 +182,37 @@ function ProductPage() {
                         <Button
                             onClick={() => {
                                 console.log(selectedCombination);
+
+                                const id = product._id;
+                                const title = product.title;
+                                const variant = selectedCombination.combination;
+                                const image = selectedCombination.image || product.images[0];
+                                const unitPrice = selectedCombination.price;
+
+                                const item = {
+                                    id,
+                                    title,
+                                    variant,
+                                    image,
+                                    quantity: 1,
+                                    unitPrice
+                                };
+
+                                const storedItems = JSON.parse(localStorage.getItem('cartItems')) || [];
+
+                                const existingItemIndex = storedItems.findIndex(
+                                    (storedItem) =>
+                                        storedItem.id === item.id && storedItem.variant === item.variant
+                                );
+
+                                if (existingItemIndex !== -1) {
+                                    storedItems[existingItemIndex].quantity += 1;
+                                } else {
+                                    storedItems.push(item);
+                                }
+
+                                localStorage.setItem('cartItems', JSON.stringify(storedItems));
+                                toast.success('article ajouté au panier')
                             }}
                             className="w-full bg-black hover:bg-black hover:opacity-90 active:opacity-80"
                         >

@@ -6,7 +6,7 @@ function GuestLayout() {
     return (
         <>
             <Navbar />
-            <main className="bg-white mt-[72px]">
+            <main className="bg-white mt-[72px] min-h-screen">
                 <Outlet />
             </main>
             <footer className='mt-10 p-4 text-center border-t'>
