@@ -34,16 +34,16 @@ function Home() {
         <div>
             {/* Hero Section */}
             <div className="text-center py-20 px-6">
-                <h1 className="text-4xl font-bold text-gray-800">Welcome to Our Store</h1>
-                <p className="mt-2 text-gray-600">Discover the best products at amazing prices</p>
+                <h1 className="text-4xl font-bold text-gray-800">Bienvenue</h1>
+                <p className="mt-2 text-gray-600">Découvrez les meilleurs produits à des prix incroyables</p>
                 <Button className='mt-4 bg-black hover:bg-black hover:opacity-85 active:opacity-80'>
-                    Shop now
+                    Achetez maintenant
                 </Button>
             </div>
 
             {/* Categories Section */}
             <div className="py-10 px-6">
-                <h2 className="text-2xl font-semibold text-gray-800 mb-6 text-center">Categories</h2>
+                <h2 className="text-2xl font-semibold text-gray-800 mb-6 text-center">Catégories</h2>
                 <div className='sm:px-10'>
                     <Carousel
                         opts={{
@@ -87,7 +87,7 @@ function Home() {
 
             {/* Top Products Section */}
             <div className="py-10 px-6">
-                <h2 className="text-2xl font-semibold text-gray-800 mb-6 text-center">Top Products</h2>
+                <h2 className="text-2xl font-semibold text-gray-800 mb-6 text-center">Produits phares</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                     {topProducts.map((product) => (
                         <div

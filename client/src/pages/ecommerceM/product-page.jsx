@@ -2,13 +2,14 @@ import { axiosClient } from "@/api/axios";
 import CustomInput from "@/components/custom/CustomInput";
 import ProductImages from "@/components/ecommerceM/product-images";
 import { Button } from "@/components/ui/button";
-import { MinusIcon, PlusIcon } from "lucide-react";
+import { MinusIcon, PlusIcon, StarIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 function ProductPage() {
     const { id } = useParams();
     const [product, setProduct] = useState({});
+    const [reviews, setReviews] = useState([]);
     const [variants, setVariants] = useState([]);
     const [combinations, setCombinations] = useState([]);
     const [selectedImage, setSelectedImage] = useState(""); // State for the selected image
@@ -22,11 +23,17 @@ function ProductPage() {
                 const response = await axiosClient.get(`/products/${id}`);
                 setProduct(response.data);
                 setSelectedImage(response.data.images[0]); // Set the initial selected image
+
+                const response2 = await axiosClient.get(`/products/reviews/${id}`);
+                setReviews(response2.data);
+                console.log(response2.data);
+
+
                 if (response.data.isVariant) {
-                    const response2 = await axiosClient.get(`/products/variants/${id}`);
-                    setVariants(response2.data);
-                    const response3 = await axiosClient.get(`/products/combinations/${id}`);
-                    setCombinations(response3.data);
+                    const response3 = await axiosClient.get(`/products/variants/${id}`);
+                    setVariants(response3.data);
+                    const response4 = await axiosClient.get(`/products/combinations/${id}`);
+                    setCombinations(response4.data);
                 }
             } catch (error) {
                 console.error("There was an error fetching the products!", error);
@@ -77,7 +84,15 @@ function ProductPage() {
     };
 
     const handleQuantityChange = (event) => {
-        setQuantity(event.target.value);
+        const value = event.target.value;
+
+        // Parse the input value as an integer
+        const parsedValue = parseInt(value, 10);
+
+        // Check if the parsed value is a valid integer and greater than zero
+        if (!isNaN(parsedValue) && Number.isInteger(parsedValue) && parsedValue > 0) {
+            setQuantity(parsedValue); // Set quantity only if valid
+        }
     };
 
     return (
@@ -140,10 +155,11 @@ function ProductPage() {
                         )
                     }
 
-                    <label className="text-lg font-medium">Quantity:</label>
+                    <label className="text-lg font-medium">Quantité:</label>
                     <div className="mb-2 flex flex-col sm:flex-row items-center sm:gap-5">
                         <div className="flex items-center gap-0.5">
                             <Button
+                                className="p-0"
                                 variant='ghost'
                                 onClick={() => { quantity > 1 && setQuantity(prev => prev - 1) }}
                                 disabled={quantity <= 1}
@@ -151,12 +167,11 @@ function ProductPage() {
                                 <MinusIcon />
                             </Button>
                             <CustomInput
-                                type="number"
-                                min="1"
                                 value={quantity}
                                 onChange={handleQuantityChange}
                             />
                             <Button
+                                className='p-0'
                                 variant='ghost'
                                 onClick={() => { setQuantity(prev => prev + 1) }}
                             >
@@ -169,21 +184,121 @@ function ProductPage() {
                             }}
                             className="w-full bg-black hover:bg-black hover:opacity-90 active:opacity-80"
                         >
-                            Add to Cart
+                            Ajouter au panier
                         </Button>
                     </div>
                     <Button
                         className="w-full bg-black hover:bg-black hover:opacity-90 active:opacity-80"
                     >
-                        Order now
+                        Commandez maintenant
                     </Button>
                 </div>
             </div>
             {/* Product Description */}
             <div
-                className="sm:px-10 mt-10"
+                className="mt-10"
                 dangerouslySetInnerHTML={{ __html: product.description }}
             ></div>
+
+            {/* Product Reviews  */}
+            {
+                reviews.length > 0 &&
+                <div>
+                    <div className="mt-16 mb-10 mx-auto w-[65%] grid grid-cols-1 lg:grid-cols-3 gap-10">
+                        <div className="lg:border-r-2 border-stone-100">
+                            <h4 className="text-lg font-semibold text-gray-700">Nombre d'avis</h4>
+                            <p className="text-xl font-bold">{reviews.length}</p>
+                        </div>
+
+                        <div className="lg:border-r-2 border-stone-100">
+                            <h4 className="text-lg font-semibold text-gray-700">Note moyenne</h4>
+                            <div className="flex items-center gap-3">
+                                <p className="text-xl font-bold">
+                                    {
+                                        reviews.length > 0
+                                            ?
+                                            (reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length).toFixed(1)
+                                            :
+                                            'N/A'
+                                    }
+                                </p>
+                                <div className="flex gap-1 items-center">
+                                    {
+                                        Array.from({ length: 5 }).map((_, index) => (
+                                            <StarIcon
+                                                key={index}
+                                                className={`h-4 w-4 ${index < (reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length).toFixed(1) ? 'text-yellow-500' : 'text-gray-300'}`}
+                                            />
+                                        ))
+                                    }
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            {Array.from({ length: 5 }, (_, index) => {
+                                const colors = ['bg-green-500', 'bg-pink-500', 'bg-yellow-500', 'bg-blue-500', 'bg-red-500'];
+                                return <div key={5 - index} className="flex items-center text-gray-700 gap-1.5">
+                                    <div className="flex items-center gap-0.5">
+                                        <StarIcon className='h-2.5 w-2.5' />
+                                        <span className="font-semibold w-3">{5 - index}</span>
+                                    </div>
+                                    <div
+                                        style={{
+                                            width:
+                                                reviews.filter((review) => review.rating === 5 - index).length > 0
+                                                    ? `${(reviews.filter((review) => review.rating === 5 - index).length / reviews.length) * 100}%`
+                                                    : '3px'
+                                        }}
+                                        className={`h-1 rounded-full ${colors[index]}`}
+                                    ></div>
+                                    <span>{reviews.filter((review) => review.rating === 5 - index).length}</span>
+                                </div>
+                            })}
+                        </div>
+                    </div>
+
+                    {reviews.map((review) => (
+                        <div key={review._id} className="py-4 border-t-2 border-stone-100">
+                            <div className="flex items-center justify-between mb-2">
+                                <div>
+                                    <h3 className="text-lg font-medium capitalize">{review.fullName}</h3>
+                                    <p className="text-xs text-gray-400">
+                                        {new Date(review.createdAt).toLocaleDateString('fr-FR', {
+                                            weekday: 'long', // Day of the week
+                                            year: 'numeric', // Year in numeric format
+                                            month: 'long',   // Full month name
+                                            day: 'numeric'   // Day of the month
+                                        })}
+                                    </p>
+                                </div>
+                                <div className="flex items-center gap-1">
+                                    {Array.from({ length: 5 }).map((_, index) => (
+                                        <StarIcon
+                                            key={index}
+                                            className={`h-5 w-5 ${index < review.rating ? 'text-yellow-500' : 'text-gray-300'
+                                                }`}
+                                        />
+                                    ))}
+                                </div>
+                            </div>
+                            <p className="mb-2">{review.comment}</p>
+                            {review.images?.length > 0 && (
+                                <div className="grid grid-cols-2 gap-2 mt-2">
+                                    {review.images.map((image, idx) => (
+                                        <img
+                                            key={idx}
+                                            src={image}
+                                            alt={`Review Image ${idx + 1}`}
+                                            className="h-20 w-20 object-cover rounded-md"
+                                        />
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    ))}
+                </div>
+            }
         </div>
     );
 }

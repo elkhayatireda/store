@@ -11,7 +11,7 @@ function Coupons() {
         <div>
             <div className=' flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-0'>
                 <div>
-                    <h2 className="text-4xl font-semibold">Coupons</h2>
+                    <h2 className="text-2xl font-semibold">Coupons</h2>
                     <p className='text-sm'>Here you can manage the coupons in your store</p>
                 </div>
                 <Link

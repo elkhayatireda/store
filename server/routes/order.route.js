@@ -13,7 +13,7 @@ import {
 
 const router = express.Router();
 
-router.post('/', verifyTokenAdmin, createOrder);
+router.post('/', createOrder);
 router.post('/delete-multiple', verifyTokenAdmin, deleteOrders);
 router.get('/', verifyTokenAdmin, getAllOrders);
 router.get('/:id', verifyTokenAdmin, getOrderById);
