@@ -1,19 +1,19 @@
 import { Button } from '@/components/ui/button';
 import { Search, ShoppingCart, Menu } from 'lucide-react'; // Importing icons from Lucid
-import { Outlet } from "react-router-dom";
+import { Link, Outlet } from "react-router-dom";
 
 function GuestLayout() {
     return (
-        <>
+        <div className="flex flex-col min-h-screen">
             <Navbar />
-            <main className="bg-white mt-[72px] min-h-screen">
+            <main className="bg-white mt-[72px] flex-grow">
                 <Outlet />
             </main>
-            <footer className='mt-10 p-4 text-center border-t'>
-                <h2 className='text-xl font-semibold text-gray-800'>YourLogo</h2>
-                <p className='text-sm text-gray-500'>all rights reserved, 2024</p>
+            <footer className="mt-10 p-4 text-center border-t">
+                <h2 className="text-xl font-semibold text-gray-800">YourLogo</h2>
+                <p className="text-sm text-gray-500">all rights reserved, 2024</p>
             </footer>
-        </>
+        </div>
     );
 }
 
@@ -36,7 +36,9 @@ function Navbar() {
                     <Search size={24} />
                 </Button>
                 <Button variant='ghost' className="text-gray-700">
-                    <ShoppingCart size={24} />
+                    <Link to={'/m/cart'}>
+                        <ShoppingCart size={24} />
+                    </Link>
                 </Button>
             </div>
         </nav >
