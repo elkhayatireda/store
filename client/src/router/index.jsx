@@ -36,6 +36,7 @@ import Home from '@/pages/ecommerceM/home';
 import GuestLayout from '../layouts/GuestLayout';
 import ProductPage from '@/pages/ecommerceM/product-page';
 import Cart from '@/pages/ecommerceM/cart';
+import Checkout from '@/pages/ecommerceM/checkout';
 // router
 export const router = createBrowserRouter([
     {
@@ -132,6 +133,10 @@ export const router = createBrowserRouter([
             {
                 path: 'cart',
                 element: <Cart />
+            },
+            {
+                path: 'checkout',
+                element: <Checkout />
             },
         ]
     },

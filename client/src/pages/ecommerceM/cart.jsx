@@ -87,7 +87,7 @@ function Cart() {
 
             <div className="mt-6">
                 <Button disabled={cartItems.length === 0}>
-                    <Link to={'/caisse'}>
+                    <Link to={'/m/checkout'}>
                         Passer à la caisse
                     </Link>
                 </Button>
