@@ -10,9 +10,9 @@ const router = express.Router();
 
 router.post('/', verifyTokenAdmin, upload.single('img'), createCategory);
 router.post('/delete-multiple', verifyTokenAdmin, deleteCategories);
-router.get('/', verifyTokenAdmin, getCategories);
-router.get('/getAll', verifyTokenAdmin, getAllCategories);
-router.get('/:id', verifyTokenAdmin, getCategory);
+router.get('/', getCategories);
+router.get('/getAll', getAllCategories);
+router.get('/:id', getCategory);
 router.put('/:id', verifyTokenAdmin, upload.single('img'), updateCategory);
 router.delete('/:id', verifyTokenAdmin, deleteCategory);
 

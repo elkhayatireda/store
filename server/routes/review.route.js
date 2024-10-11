@@ -11,8 +11,8 @@ const router = express.Router();
 router.post('/',upload.none(), verifyTokenAdmin, createReview);
 router.post('/status/:id', verifyTokenAdmin, statusReview);
 router.post('/delete-multiple', verifyTokenAdmin, deleteMultiple);
-router.get('/',verifyTokenAdmin, getReviews);
-router.get('/:id',verifyTokenAdmin, getReview);
+router.get('/', getReviews);
+router.get('/:id', getReview);
 router.post('/update/:id', upload.none(), verifyTokenAdmin, updateReview);
 router.delete('/:id',verifyTokenAdmin, deleteReview); 
 

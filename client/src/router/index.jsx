@@ -39,13 +39,8 @@ import ProductPage from '@/pages/ecommerceM/product-page';
 // router
 export const router = createBrowserRouter([
     {
-        element: <HostLayout />,
-        children: [
-            {
-                path: "/admin/login",
-                element: <AdminSingnIn />
-            },
-        ]
+        path: "/admin/login",
+        element: <AdminSingnIn />
     },
     {
         element: <AdminLayout />,
