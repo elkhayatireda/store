@@ -88,49 +88,54 @@ function Checkout() {
     const totalPrice = cartItems.reduce((total, item) => total + item.unitPrice * item.quantity, 0).toFixed(2);
 
     return (
-        <div className="w-full flex flex-col md:flex-row justify-center gap-10">
-            <div>
-                <h1 className="text-xl font-medium mb-4">Résumé de la commande</h1>
-                <ul className="space-y-2 mb-6">
-                    {cartItems.map((item) => (
-                        <li key={item.id + item.variant} className="flex items-center justify-between gap-2 border-b border-gray-100 pb-2.5">
-                            <span className='text-sm'>{item.title} ({item.variant})</span>
-                            <span className='text-xs'>{item.quantity} x {item.unitPrice} MAD</span>
-                        </li>
-                    ))}
-                </ul>
-                <div className="flex justify-between items-center mb-4">
-                    <span className="font-bold">Total:</span>
-                    <span className="text-lg">{totalPrice} MAD</span>
+        <div className='p-5'>
+            <div className="w-full grid grid-cols-1 md:grid-cols-2">
+                <div className='md:pr-5 md:border-r'>
+                    <h1 className="text-2xl font-semibold mb-6">Caise</h1>
+                    <form onSubmit={handleSubmit} className="space-y-4">
+                        <CustomInput
+                            name="fullName"
+                            label="Nom complet"
+                            value={formDetails.fullName}
+                            onChange={handleChange}
+                            error={errors.fullName}
+                        />
+                        <CustomInput
+                            name="phoneNumber"
+                            label="Numéro de téléphone"
+                            value={formDetails.phoneNumber}
+                            onChange={handleChange}
+                            error={errors.phoneNumber}
+                        />
+                        <CustomInput
+                            name="address"
+                            label="Adresse"
+                            value={formDetails.address}
+                            onChange={handleChange}
+                            error={errors.address}
+                        />
+                        <button type="submit" className="w-full bg-blue-600 text-white font-semibold py-2 rounded-md hover:bg-blue-700 transition">
+                            Sauvegarder
+                        </button>
+                    </form>
+                </div>
+
+                <div className='mt-10 md:mt-0 md:pl-5'>
+                    <h2 className='text-lg font-medium mb-4'>Résumé de la commande</h2>
+                    <ul className="space-y-2 mb-6">
+                        {cartItems.map((item) => (
+                            <li key={item.id + item.variant} className="flex items-center justify-between gap-2 border-b border-gray-100 pb-2.5">
+                                <span className='text-sm'>{item.title} ({item.variant})</span>
+                                <span className='text-xs'>{item.quantity} x {item.unitPrice} MAD</span>
+                            </li>
+                        ))}
+                    </ul>
+                    <div className="flex justify-between items-center mb-4">
+                        <span className="font-bold">Total:</span>
+                        <span className="text-lg">{totalPrice} MAD</span>
+                    </div>
                 </div>
             </div>
-
-            <form onSubmit={handleSubmit} className="space-y-4">
-                <CustomInput
-                    name="fullName"
-                    label="Nom complet"
-                    value={formDetails.fullName}
-                    onChange={handleChange}
-                    error={errors.fullName}
-                />
-                <CustomInput
-                    name="phoneNumber"
-                    label="Numéro de téléphone"
-                    value={formDetails.phoneNumber}
-                    onChange={handleChange}
-                    error={errors.phoneNumber}
-                />
-                <CustomInput
-                    name="address"
-                    label="Adresse"
-                    value={formDetails.address}
-                    onChange={handleChange}
-                    error={errors.address}
-                />
-                <button type="submit" className="w-full bg-blue-600 text-white font-semibold py-2 rounded-md hover:bg-blue-700 transition">
-                    Sauvegarder
-                </button>
-            </form>
         </div>
     );
 }

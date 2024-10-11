@@ -52,8 +52,8 @@ function Cart() {
             ) : (
                 <ul className="space-y-6">
                     {cartItems.map((item) => (
-                        <li key={item.id + item.variant} className='flex gap-3'>
-                            <img className='w-1/5 aspect-square object-cover rounded-md' src={item.image} alt={item.title + ' ' + item.variant} />
+                        <li key={item.id + item.variant} className='flex flex-col sm:flex-row gap-3'>
+                            <img className='mx-auto w-32 md:w-1/5 aspect-square object-cover rounded-md' src={item.image} alt={item.title + ' ' + item.variant} />
                             <div className='flex-1'>
                                 <div className='flex justify-between items-center'>
                                     <h2 className="text-lg font-medium capitalize">{item.title}</h2>
